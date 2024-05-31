@@ -1,0 +1,41 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "animalwhispererflutter",
+          "appId": "1:208896530099:android:0cea104e34eae09a4482c6",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "animalwhispererflutter",
+          "configurations": {
+            "android": "1:208896530099:android:0cea104e34eae09a4482c6",
+            "ios": "1:208896530099:ios:89e0406f033486f04482c6",
+            "macos": "1:208896530099:ios:89e0406f033486f04482c6",
+            "web": "1:208896530099:web:94610be768f6f9074482c6",
+            "windows": "1:208896530099:web:d295810b0fe1d5824482c6"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
+}

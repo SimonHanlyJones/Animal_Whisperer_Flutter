@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 
 class UserMessageCard extends StatelessWidget {
   final String message;
+  final Alignment alignment;
+  final double maxWidthPercentage;
 
-  UserMessageCard({required this.message});
+  UserMessageCard({
+    required this.message,
+    this.maxWidthPercentage = 0.9, // default to 90% of screen width
+    this.alignment = Alignment.centerRight, // default alignment
+  });
 
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: alignment,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width *
-              0.9, // Max width of 90% of the screen width
+              maxWidthPercentage, // Max width of 90% of the screen width
         ),
         child: Container(
           padding: EdgeInsets.all(10),

@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'screens/text_chat_screen.dart';
-import 'models/message.dart';
 import 'services/providers/multiprovider_setup.dart';
 import 'theme/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:provider/provider.dart'; // Import Provider package
-import 'services/providers/chat_messages_provider/chat_messages_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

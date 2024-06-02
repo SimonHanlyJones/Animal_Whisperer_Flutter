@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:Animal_Whisperer/models/message.dart';
 import 'package:Animal_Whisperer/services/providers/voice_interaction_providers/synthesis_provider.dart';
 import 'package:Animal_Whisperer/services/providers/voice_interaction_providers/voice_conversation_context_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_event.dart';
 import 'package:speech_to_text/speech_to_text_provider.dart';
-// import '../components/conversationComponents/voice_recognition_use_for_micLevels.dart';
-import '../components/conversationComponents/recognition_provider_example_widget.dart';
+
+import '../components/conversationComponents/voice_conversationUI.dart';
 import '../services/providers/chat_messages_provider/chat_messages_provider.dart';
 
 class ConversationScreen extends StatefulWidget {
@@ -20,9 +19,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
   late ConversationContext conversationContext;
   late ChatMessagesProvider chatMessagesProvider;
   late SynthesisProvider synthesisProvider;
+  late SpeechToTextProvider recognitionProvider;
 
   StreamSubscription<SpeechRecognitionEvent>? _recognitionSubscription;
-  late SpeechToTextProvider recognitionProvider;
   StreamSubscription<TtsEvent>? _synthesisSubscription;
 
   @override
@@ -127,47 +126,36 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Conversation'),
+        title: Text('Lets have a chat!'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                final speechProvider =
-                    Provider.of<SpeechToTextProvider>(context, listen: false);
-                if (!speechProvider.isListening) {
-                  speechProvider.listen(partialResults: true, soundLevel: true);
-                }
-              },
-              child: Text('Start Listening'),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                final conversationContext =
-                    Provider.of<ConversationContext>(context, listen: false);
-                if (conversationContext.isConversation) {
-                  conversationContext.stopConversation();
-                } else {
-                  conversationContext.startConversation();
-                }
-              },
-              child: Text(
-                Provider.of<ConversationContext>(context).isConversation
-                    ? 'Stop Conversation'
-                    : 'Start Conversation',
-              ),
-            ),
-          ),
-          Expanded(
-            child: SpeechProviderExampleWidget(),
-          ),
-        ],
-      ),
+      body: ConversationScreenUI(),
+      // body: Column(
+      //   children: [
+
+      //     Padding(
+      //       padding: const EdgeInsets.all(16.0),
+      //       child: ElevatedButton(
+      //         onPressed: () {
+      //           final conversationContext =
+      //               Provider.of<ConversationContext>(context, listen: false);
+      //           if (conversationContext.isConversation) {
+      //             conversationContext.stopConversation();
+      //           } else {
+      //             conversationContext.startConversation();
+      //           }
+      //         },
+      //         child: Text(
+      //           Provider.of<ConversationContext>(context).isConversation
+      //               ? 'Stop Conversation'
+      //               : 'Start Conversation',
+      //         ),
+      //       ),
+      //     ),
+      //     Expanded(
+      //       child: SpeechProviderExampleWidget(),
+      //     ),
+      //   ],
+      // ),
     );
   }
 }

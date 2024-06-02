@@ -4,17 +4,25 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 // Base class for common styling and properties
 abstract class BaseAssistantCard extends StatelessWidget {
   final Widget Function(BuildContext context) buildChild;
+  final Alignment alignment;
+  final double maxWidthPercentage;
+  final double minWidthPercentage;
 
-  BaseAssistantCard({required this.buildChild});
+  BaseAssistantCard({
+    required this.buildChild,
+    this.maxWidthPercentage = 0.9, // default to 90% of screen width
+    this.alignment = Alignment.centerLeft, // default alignment
+    this.minWidthPercentage = 0.0,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: alignment,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width *
-              0.9, // Max width of 90% of the screen width
+          maxWidth: MediaQuery.of(context).size.width * maxWidthPercentage,
+          minWidth: MediaQuery.of(context).size.width * minWidthPercentage,
         ),
         child: Container(
           padding: EdgeInsets.all(10),

@@ -16,7 +16,7 @@ class SynthesisProvider with ChangeNotifier {
 
   Stream<TtsEvent> get events => _eventController.stream;
 
-  void _initializeTTS() {
+  Future<void> _initializeTTS() async {
     _flutterTts.setStartHandler(() {
       _isSynthesizing = true;
       notifyListeners();
@@ -35,7 +35,10 @@ class SynthesisProvider with ChangeNotifier {
       notifyListeners();
     });
 
-    _flutterTts.setLanguage("en-AU");
+    await _flutterTts
+        .setVoice({"name": "en-au-x-aub-network", "locale": "en-AU"});
+
+    // _flutterTts.setLanguage("en-AU");
     _flutterTts.setPitch(0.8);
   }
 
@@ -43,7 +46,8 @@ class SynthesisProvider with ChangeNotifier {
   String? get lastError => _lastError;
 
   Future speak(String text) async {
-    await _flutterTts.setLanguage("en-AU");
+    await _flutterTts
+        .setVoice({"name": "en-au-x-aub-network", "locale": "en-AU"});
     await _flutterTts.speak(text);
   }
 
@@ -60,7 +64,13 @@ class SynthesisProvider with ChangeNotifier {
 
   void listVoices() async {
     var voices = await _flutterTts.getVoices;
-    print("Available voices: $voices");
+    // print("Available voices: $voices");
+    for (var voice in voices) {
+      if (voice['locale'] != null &&
+          (voice['locale'].toLowerCase() == 'en-au')) {
+        print('Name: ${voice['name']}, Locale: ${voice['locale']}');
+      }
+    }
   }
 
   @override

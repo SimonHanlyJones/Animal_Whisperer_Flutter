@@ -23,12 +23,17 @@ class ChatMessagesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addMessages(List<Message> messages) {
-    _messages.addAll(messages);
-    notifyListeners();
-  }
-
   Future<Message?> sendMessage(String text) async {
+    if (_messages.isNotEmpty) {
+      final lastMessage = _messages.last;
+      final time = DateTime.now();
+      final timeDifference = time.difference(lastMessage.time).inMilliseconds;
+
+      if (lastMessage.message == text && timeDifference <= 300) {
+        // Discard the message if it is a duplicate within 300 ms
+        return null;
+      }
+    }
     _waitingForResponse = true;
     notifyListeners();
 

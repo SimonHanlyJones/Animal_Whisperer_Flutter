@@ -29,7 +29,7 @@ class ConversationContext with ChangeNotifier {
   void startConversation() {
     _aiMessageForSynthesis = null;
     _isConversation = true;
-    _recognitionProvider!.listen(partialResults: true, soundLevel: true);
+    _recognitionProvider.listen(partialResults: true, soundLevel: true);
     notifyListeners();
   }
 

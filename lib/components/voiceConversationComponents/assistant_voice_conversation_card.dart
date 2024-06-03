@@ -13,12 +13,13 @@ class AssistantVoiceConversationInfoCard extends BaseAssistantCard {
   }) : super(
           buildChild: (context) => Text(
             text,
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onTertiary,
               fontSize: 16,
             ),
           ),
-          maxWidthPercentage: maxWidthPercentage,
+          fixedWidth: true,
           alignment: alignment,
         );
 }
@@ -49,6 +50,6 @@ class ConditionalAssistantCard extends StatelessWidget {
     } else if (isWaitingForResponse) {
       return "Hmm, just give me a sec to think about that\n";
     }
-    return ""; // Return empty string if no conditions are met
+    return "\n\n"; // Return empty string if no conditions are met
   }
 }

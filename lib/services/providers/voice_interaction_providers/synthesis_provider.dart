@@ -51,7 +51,7 @@ class SynthesisProvider with ChangeNotifier {
     await _flutterTts.speak(text);
   }
 
-  void stop() async {
+  Future<void> stop() async {
     await _flutterTts.stop();
     _isSynthesizing = false;
     notifyListeners();

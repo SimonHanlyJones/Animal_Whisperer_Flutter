@@ -20,17 +20,14 @@ class AppProviders extends StatelessWidget {
           ),
           ChangeNotifierProvider<SynthesisProvider>(
               create: (_) => SynthesisProvider()),
-          ChangeNotifierProxyProvider2<SynthesisProvider, SpeechToTextProvider,
-              ConversationContext>(
-            create: (context) => ConversationContext(
-                synthesisProvider:
-                    Provider.of<SynthesisProvider>(context, listen: false),
-                recognitionProvider:
-                    Provider.of<SpeechToTextProvider>(context, listen: false)),
+          ChangeNotifierProxyProvider3<SynthesisProvider, SpeechToTextProvider,
+              ChatMessagesProvider, ConversationContext>(
+            create: (context) => ConversationContext(),
             update: (context, synthesisProvider, recognitionProvider,
-                    conversationContext) =>
+                    chatMessagesProvider, conversationContext) =>
                 conversationContext!
-                  ..updateDependencies(synthesisProvider, recognitionProvider),
+                  ..updateDependencies(synthesisProvider, recognitionProvider,
+                      chatMessagesProvider),
           ),
         ],
         child: MyApp(),

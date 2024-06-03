@@ -74,7 +74,7 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
           ], // Customize your gradient colors here
         )),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // Circle image at the top/middle
             Center(
@@ -88,73 +88,105 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
                 ),
               ),
             ),
-            SizedBox(height: 20), // Spacing between image and mic visualizer
-            // Microphone with levels visualizer
-            Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      blurRadius: .26,
-                      spreadRadius: recognitionProvider.lastLevel * 2.0,
-                      color: Colors.white.withOpacity(.20))
-                ],
-                color: Colors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(50)),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.mic),
-                onPressed: () {
-                  // Handle microphone button press
-                },
-              ),
-            ),
-            SizedBox(height: 80), // Spacing between mic visualizer and text
-            // Conditional text
             ConditionalAssistantCard(
               isConversationActive: conversationContext.isConversation,
               isListening: recognitionProvider.isListening,
               isWaitingForResponse: chatMessagesProvider.waitingForResponse,
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).colorScheme.primary,
-        shape: CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  // onPrimary: Theme.of(context).colorScheme.onSecondary,
-                ),
-                onPressed: () {
-                  if (conversationContext.isConversation) {
-                    conversationContext.stopConversation();
-                  } else {
-                    conversationContext.startConversation();
-                  }
-                },
-                child: Text(
-                    conversationContext.isConversation
-                        ? 'Stop Conversation'
-                        : 'Start Conversation',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSecondary,
-                    )),
-              ),
-            ),
+            Expanded(
+              child: Container(),
+            ), // Spacing between mic visualizer and text
+            // Conditional text
+            _mic_visualiser(recognitionProvider: recognitionProvider),
+            SizedBox(height: 20),
+
+            _voice_conversation_footer(context),
           ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
+}
+
+class _mic_visualiser extends StatelessWidget {
+  const _mic_visualiser({
+    super.key,
+    required this.recognitionProvider,
+  });
+
+  final SpeechToTextProvider recognitionProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+              blurRadius: .26,
+              spreadRadius: recognitionProvider.lastLevel * 2.0,
+              color: Colors.white.withOpacity(.20))
+        ],
+        color: Colors.white,
+        borderRadius: const BorderRadius.all(Radius.circular(50)),
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.mic),
+        onPressed: () {
+          // Handle microphone button press
+        },
+      ),
+    );
+  }
+}
+
+class _voice_conversation_controls extends StatelessWidget {
+  const _voice_conversation_controls({
+    super.key,
+    required this.conversationContext,
+  });
+
+  final ConversationContext conversationContext;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            // onPrimary: Theme.of(context).colorScheme.onSecondary,
+          ),
+          onPressed: () {
+            if (conversationContext.isConversation) {
+              conversationContext.stopConversation();
+            } else {
+              conversationContext.startConversation();
+            }
+          },
+          child: Text(
+              conversationContext.isConversation
+                  ? 'Stop Conversation'
+                  : 'Start Conversation',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+              )),
+        ),
+      ],
+    );
+  }
+}
+
+Widget _voice_conversation_footer(BuildContext context) {
+  var conversationContext = Provider.of<ConversationContext>(context);
+  return Container(
+    color: Theme.of(context).colorScheme.primary,
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+    child:
+        _voice_conversation_controls(conversationContext: conversationContext),
+  );
 }

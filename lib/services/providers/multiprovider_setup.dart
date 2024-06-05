@@ -2,6 +2,7 @@ import 'package:Animal_Whisperer/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text_provider.dart';
+import 'authentication_provider.dart';
 import 'chat_messages_provider/chat_messages_provider.dart';
 import 'voice_interaction_providers/recognition_provider.dart';
 import 'voice_interaction_providers/voice_conversation_context_provider.dart';
@@ -15,6 +16,9 @@ class AppProviders extends StatelessWidget {
     return Recognition_ProviderSetup(
       child: MultiProvider(
         providers: [
+          ChangeNotifierProvider<AuthenticationProvider>(
+            create: (_) => AuthenticationProvider(),
+          ),
           ChangeNotifierProvider<ChatMessagesProvider>(
             create: (_) => ChatMessagesProvider(),
           ),

@@ -73,8 +73,8 @@ class ConversationContext with ChangeNotifier {
       _debounceTimerMessage = Timer(Duration(milliseconds: 300), () {});
       // Send the message
 
-      aiMessageForSynthesis = await _chatMessagesProvider
-          .sendMessage(event.recognitionResult!.recognizedWords);
+      aiMessageForSynthesis = await _chatMessagesProvider.sendMessage(
+          text: event.recognitionResult!.recognizedWords);
       _checkAndSynthesizeResponse(aiMessageForSynthesis);
     }
   }

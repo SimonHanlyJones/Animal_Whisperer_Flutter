@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../components/chatHistoryDrawer/chat_history_drawer.dart';
 import '../components/chatUIcomponents/assistant_message_card.dart';
 import '../components/chatUIcomponents/message_card_fade_in.dart';
 import '../components/chatUIcomponents/user_message_card.dart';
@@ -8,6 +9,7 @@ import '../models/chatbot_manager.dart';
 import '../services/providers/chat_messages_provider/chat_messages_provider.dart';
 import 'voice_conversation_screen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -18,17 +20,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-
-  final ChatbotManager manager = ChatbotManager();
-  List<ChatbotProvider> providers = [
-    ChatbotProvider(
-        name: "OpenAI",
-        sendMessage: (msg) async {
-          // Placeholder for OpenAI API call logic
-          return "Response from OpenAI";
-        }),
-  ];
-  late ChatbotProvider selectedProvider;
+  // final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -70,7 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (text.isNotEmpty) {
       final chatMessagesProvider =
           Provider.of<ChatMessagesProvider>(context, listen: false);
-      chatMessagesProvider.sendMessage(text);
+      chatMessagesProvider.sendMessage(text: text);
     }
     _controller.clear();
     _focusNode.requestFocus();
@@ -81,12 +73,13 @@ class _ChatScreenState extends State<ChatScreen> {
     final chatMessagesProvider = Provider.of<ChatMessagesProvider>(context);
 
     return Scaffold(
+      drawer: ChatHistoryDrawer(),
       appBar: AppBar(
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child:
-                Image.asset('assets/play_store_512.png'), // Path to your logo
-          ),
+          // leading: Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child:
+          //       Image.asset('assets/play_store_512.png'), // Path to your logo
+          // ),
           title: Text('The Animal Whisperer'),
           centerTitle: true),
       body: Container(
@@ -133,6 +126,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       controller: _controller,
                       focusNode: _focusNode,
                       onSubmitted: _handleSubmitted,
+                      maxLines: 5,
+                      minLines: 1,
                       decoration: InputDecoration.collapsed(
                         hintText: "Send a message",
                         hintStyle: TextStyle(
@@ -202,9 +197,9 @@ class text_chat_bubbles_builder extends StatelessWidget {
             }
             final message = chatMessagesProvider.messages[index];
             if (message.role == 'assistant') {
-              card = AssistantMessageCard(message: message.message);
+              card = AssistantMessageCard(content: message.content);
             } else if (message.role == 'user') {
-              card = UserMessageCard(message: message.message);
+              card = UserMessageCard(content: message.content);
             } else {
               return const SizedBox.shrink();
             }

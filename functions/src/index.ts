@@ -74,23 +74,23 @@ exports.animalChat = onCall({ secrets: ["OPENAI"] }, async (request) => {
     );
   }
 
-  request.data.messages.forEach((message: any) => {
-    if (typeof message !== "object" || !message.role || !message.content) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Each message in the 'messages' array must be an object with 'role' and 'content' properties."
-      );
-    }
-    if (
-      typeof message.role !== "string" ||
-      typeof message.content !== "string"
-    ) {
-      throw new HttpsError(
-        "invalid-argument",
-        "The 'role' and 'content' properties of each message must be strings."
-      );
-    }
-  });
+  // request.data.messages.forEach((message: any) => {
+  //   if (typeof message !== "object" || !message.role || !message.content) {
+  //     throw new HttpsError(
+  //       "invalid-argument",
+  //       "Each message in the 'messages' array must be an object with 'role' and 'content' properties."
+  //     );
+  //   }
+  //   if (
+  //     typeof message.role !== "string" ||
+  //     typeof message.content !== "string"
+  //   ) {
+  //     throw new HttpsError(
+  //       "invalid-argument",
+  //       "The 'role' and 'content' properties of each message must be strings."
+  //     );
+  //   }
+  // });
 
   const openai = new OpenAI({
     apiKey: process.env.OPENAI,

@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import '../../models/message.dart';
 
 // Base class for common styling and properties
 abstract class BaseAssistantCard extends StatelessWidget {
@@ -50,16 +54,30 @@ abstract class BaseAssistantCard extends StatelessWidget {
 }
 
 class AssistantMessageCard extends BaseAssistantCard {
-  final String message;
+  final List<MessageContent> content;
 
-  AssistantMessageCard({required this.message})
+  AssistantMessageCard({required this.content})
       : super(
-          buildChild: (context) => Text(
-            message,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onTertiary,
-              fontSize: 16,
-            ),
+          buildChild: (context) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: content.map((item) {
+              if (item.type == 'image_url') {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Image.memory(base64Decode(item.content)),
+                );
+              } else if (item.type == 'text') {
+                return Text(
+                  item.content,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onTertiary,
+                    fontSize: 16,
+                  ),
+                );
+              } else {
+                return SizedBox.shrink();
+              }
+            }).toList(),
           ),
         );
 }

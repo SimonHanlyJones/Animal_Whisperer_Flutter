@@ -54,30 +54,28 @@ abstract class BaseAssistantCard extends StatelessWidget {
 }
 
 class AssistantMessageCard extends BaseAssistantCard {
-  final List<MessageContent> content;
+  final Message message;
 
-  AssistantMessageCard({required this.content})
+  AssistantMessageCard({required this.message})
       : super(
           buildChild: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: content.map((item) {
-              if (item.type == 'image_url') {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Image.memory(base64Decode(item.content)),
-                );
-              } else if (item.type == 'text') {
-                return Text(
-                  item.content,
+            children: [
+              if (message.text != null && message.text!.isNotEmpty)
+                Text(
+                  message.text!,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onTertiary,
                     fontSize: 16,
                   ),
+                ),
+              ...message.imageUrls.map((imageUrl) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Image.network(imageUrl),
                 );
-              } else {
-                return SizedBox.shrink();
-              }
-            }).toList(),
+              }).toList(),
+            ],
           ),
         );
 }

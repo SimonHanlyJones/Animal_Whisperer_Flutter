@@ -1,16 +1,13 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
 import '../../models/message.dart';
 
 class UserMessageCard extends StatelessWidget {
-  final List<MessageContent> content;
+  final Message message;
   final Alignment alignment;
   final double maxWidthPercentage;
 
   UserMessageCard({
-    required this.content,
+    required this.message,
     this.maxWidthPercentage = 0.9, // default to 90% of screen width
     this.alignment = Alignment.centerRight, // default alignment
   });
@@ -33,23 +30,21 @@ class UserMessageCard extends StatelessWidget {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: content.map((item) {
-              if (item.type == 'image_url') {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Image.memory(base64Decode(item.content)),
-                );
-              } else if (item.type == 'text') {
-                return Text(
-                  item.content,
+            children: [
+              if (message.text != null && message.text!.isNotEmpty)
+                Text(
+                  message.text!,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.onSecondary,
                       fontSize: 16),
+                ),
+              ...message.imageUrls.map((imageUrl) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Image.network(imageUrl),
                 );
-              } else {
-                return SizedBox.shrink();
-              }
-            }).toList(),
+              }).toList(),
+            ],
           ),
         ),
       ),

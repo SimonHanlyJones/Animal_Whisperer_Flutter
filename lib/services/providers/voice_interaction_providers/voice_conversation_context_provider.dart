@@ -88,7 +88,7 @@ class ConversationContext with ChangeNotifier {
       if (_synthesisTimer?.isActive == true) return;
 
       _synthesisTimer = Timer(Duration(milliseconds: 300), () {});
-      String text = aiMessageForSynthesis!.message;
+      String text = aiMessageForSynthesis!.text;
       aiMessageForSynthesis = null;
       await _synthesisProvider.speak(text);
     }

@@ -1,15 +1,20 @@
+import 'dart:io';
+
+import 'package:Animal_Whisperer/models/message.dart';
+import 'package:Animal_Whisperer/services/providers/authentication_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:provider/provider.dart';
 import '../components/chatHistoryDrawer/chat_history_drawer.dart';
 import '../components/chatUIcomponents/assistant_message_card.dart';
 import '../components/chatUIcomponents/message_card_fade_in.dart';
 import '../components/chatUIcomponents/user_message_card.dart';
-import '../models/chatbot_provider.dart';
-import '../models/chatbot_manager.dart';
 import '../services/providers/chat_messages_provider/chat_messages_provider.dart';
 import 'voice_conversation_screen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:image_picker/image_picker.dart';
+import '../services/firestore_manager.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -20,7 +25,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  // final ImagePicker _picker = ImagePicker();
+  List<File> _pickedImagesForMessage = [];
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -34,6 +40,21 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _pickedImagesForMessage.add(File(image.path));
+      });
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _pickedImagesForMessage.removeAt(index);
     });
   }
 
@@ -59,12 +80,20 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSubmitted(String text) async {
-    if (text.isNotEmpty) {
+    if (text.isNotEmpty || _pickedImagesForMessage.isNotEmpty) {
       final chatMessagesProvider =
           Provider.of<ChatMessagesProvider>(context, listen: false);
-      chatMessagesProvider.sendMessage(text: text);
+
+      // print(imageUrls);
+      // await Future.delayed(Duration(seconds: 1));
+
+      chatMessagesProvider.sendMessage(
+          text: text, images: _pickedImagesForMessage);
     }
     _controller.clear();
+    setState(() {
+      _pickedImagesForMessage.clear();
+    });
     _focusNode.requestFocus();
   }
 
@@ -110,63 +139,132 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       color: Theme.of(context).colorScheme.primary,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Row(
+      child: Column(
         children: [
-          Flexible(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      onSubmitted: _handleSubmitted,
-                      maxLines: 5,
-                      minLines: 1,
-                      decoration: InputDecoration.collapsed(
-                        hintText: "Send a message",
-                        hintStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onSecondary,
+          if (_pickedImagesForMessage.isNotEmpty)
+            PickedImagesDisplay(
+              pickedImagesForMessage: _pickedImagesForMessage,
+              onRemoveImage: _removeImage,
+            ),
+          Row(
+            children: [
+              IconButton(
+                  icon: Icon(
+                    Icons.image,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  onPressed: _pickImage),
+              Flexible(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _controller,
+                          focusNode: _focusNode,
+                          onSubmitted: _handleSubmitted,
+                          maxLines: 5,
+                          minLines: 1,
+                          decoration: InputDecoration.collapsed(
+                            hintText: "Send a message",
+                            hintStyle: TextStyle(
+                              color: Theme.of(context).colorScheme.onSecondary,
+                            ),
+                          ),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSecondary,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSecondary,
-                        fontSize: 16,
+                      IconButton(
+                        icon: Icon(Icons.send,
+                            color: chatMessagesProvider.waitingForResponse
+                                ? Colors.grey
+                                : Theme.of(context).colorScheme.onSecondary),
+                        onPressed: chatMessagesProvider.waitingForResponse
+                            ? null
+                            : () => _handleSubmitted(_controller.text),
                       ),
+                    ],
+                  ),
+                ),
+              ),
+              IconButton(
+                  icon: Icon(Icons.phone,
+                      color: Theme.of(context).colorScheme.secondary),
+                  onPressed: () {
+                    _focusNode.unfocus();
+                    Future.delayed(Duration(milliseconds: 300), () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ConversationScreen()),
+                      );
+                    });
+                  })
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PickedImagesDisplay extends StatelessWidget {
+  const PickedImagesDisplay({
+    super.key,
+    required this.pickedImagesForMessage,
+    required this.onRemoveImage,
+  });
+
+  final List<File> pickedImagesForMessage;
+  final Function(int) onRemoveImage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImagesForMessage.length,
+        itemBuilder: (context, index) {
+          return Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.file(
+                  pickedImagesForMessage[index],
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                right: 0,
+                child: GestureDetector(
+                  onTap: () => onRemoveImage(index),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 20,
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.send,
-                        color: chatMessagesProvider.waitingForResponse
-                            ? Colors.grey
-                            : Theme.of(context).colorScheme.onSecondary),
-                    onPressed: chatMessagesProvider.waitingForResponse
-                        ? null
-                        : () => _handleSubmitted(_controller.text),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-          IconButton(
-              icon: Icon(Icons.phone,
-                  color: Theme.of(context).colorScheme.secondary),
-              onPressed: () {
-                _focusNode.unfocus();
-                Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ConversationScreen()),
-                  );
-                });
-              })
-        ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -197,9 +295,9 @@ class text_chat_bubbles_builder extends StatelessWidget {
             }
             final message = chatMessagesProvider.messages[index];
             if (message.role == 'assistant') {
-              card = AssistantMessageCard(content: message.content);
+              card = AssistantMessageCard(message: message);
             } else if (message.role == 'user') {
-              card = UserMessageCard(content: message.content);
+              card = UserMessageCard(message: message);
             } else {
               return const SizedBox.shrink();
             }

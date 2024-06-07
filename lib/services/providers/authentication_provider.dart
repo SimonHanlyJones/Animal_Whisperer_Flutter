@@ -14,6 +14,10 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Stream<User?> get userChanges => _firebaseAuth.authStateChanges();
 
+  bool isUserAuthenticated() {
+    return _firebaseAuth.currentUser != null;
+  }
+
   Future<void> signInWithEmail(String email, String password) async {
     try {
       UserCredential result = await _firebaseAuth.signInWithEmailAndPassword(

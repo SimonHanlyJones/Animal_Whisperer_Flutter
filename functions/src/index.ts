@@ -51,12 +51,9 @@ import OpenAI from "openai";
 
 exports.animalChat = onCall({ secrets: ["OPENAI"] }, async (request) => {
   // Authentication / user information is automatically added to the request.
-  //   if (request.auth) {
-  //     const uid = request.auth.uid || null;
-  //     const name = request.auth.token.name || null;
-  //     const picture = request.auth.token.picture || null;
-  //     const email = request.auth.token.email || null;
-  //   }
+  if (!request.auth || !request.auth.uid) {
+    throw new HttpsError("failed-precondition", "Log in to use this function");
+  }
 
   //   check appcheck
 
@@ -99,7 +96,7 @@ exports.animalChat = onCall({ secrets: ["OPENAI"] }, async (request) => {
   try {
     const chatCompletion = await openai.chat.completions.create({
       messages: request.data.messages,
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o",
     });
     const response = chatCompletion.choices[0].message.content;
     return response;

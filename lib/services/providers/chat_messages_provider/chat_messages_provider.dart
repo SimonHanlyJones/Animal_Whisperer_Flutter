@@ -1,51 +1,57 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import '../../../models/current_chat_session.dart';
 import '../../../models/message.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import '../../firestore_manager.dart';
+
 class ChatMessagesProvider with ChangeNotifier {
-  List<Message> _messages = [];
+  // List<Message> _messages = [];
   bool _waitingForResponse = false;
-  late final FirebaseVertexAI _vertexAI;
   late final GenerativeModel _model;
-  late final ChatSession _chat;
+  late final FirebaseVertexAI _vertexAI;
+  late final ChatSession _googleChatSessions;
+  CurrentChatSession _currentChatSession = CurrentChatSession(messages: []);
 
   ChatMessagesProvider() {
-    // Add initial system message
-    String system_prompt =
-        "You are a helpful animal expert called the Animal Whisperer. Your job is to help the user with all of their animal care questions. Do so in a funny, overenthusiastic, Australian manner like a famous Australian Crocodile Hunter.";
-    MessageContent system_prompt_content =
-        MessageContent(type: 'text', content: system_prompt);
-
-    _initializeVertexAIFirebase(system_prompt = system_prompt);
-
-    addMessage(Message(
-        time: DateTime.now(),
-        role: 'system',
-        content: [system_prompt_content]));
+    _initializeVertexAIFirebase(_currentChatSession.systemPrompt);
   }
 
   Future<void> _initializeVertexAIFirebase(String system_prompt) async {
+    final safetySettings = [
+      SafetySetting(HarmCategory.harassment, HarmBlockThreshold.none),
+      SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.none),
+      SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.none),
+      SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.none),
+    ];
     _vertexAI = FirebaseVertexAI.instance;
     _model = _vertexAI.generativeModel(
-        model: 'gemini-1.5-flash',
-        systemInstruction: Content.system(system_prompt));
-    _chat = _model.startChat();
+        model: 'gemini-1.5-pro',
+        systemInstruction: Content.system(system_prompt),
+        safetySettings: safetySettings);
+    _googleChatSessions = _model.startChat();
   }
 
-  List<Message> get messages => _messages;
+  List<Message> get messages => _currentChatSession.messages;
   bool get waitingForResponse => _waitingForResponse;
 
   void addMessage(Message message) {
-    _messages.add(message);
+    _currentChatSession.addMessage(message);
     notifyListeners();
   }
 
   Future<Message?> sendMessage(
-      {required String text, String provider = "firebaseCustom"}) async {
-    if (_messages.isNotEmpty) {
-      final lastMessage = _messages.last;
+      {String? text,
+      List<File>? images,
+      String provider = "firebaseCustom"}) async {
+    final FirebaseManager _firebaseManager = FirebaseManager();
+    if (text!.isNotEmpty || images!.isNotEmpty) {
+      final lastMessage = _currentChatSession.messages.last;
       final time = DateTime.now();
       final timeDifference = time.difference(lastMessage.time).inMilliseconds;
 
@@ -57,31 +63,52 @@ class ChatMessagesProvider with ChangeNotifier {
     _waitingForResponse = true;
     notifyListeners();
 
-    addMessage(Message(
-        time: DateTime.now(),
-        role: 'user',
-        content: [MessageContent(type: 'text', content: text)]));
-
-    if (provider == "firebaseCustom")
-      return await _ApiCallFirebaseCustom();
-    else
-    // (provider == "firebaseVertex")
-    {
-      return await _ApiCallFirebaseVertex(text);
+    addMessage(Message(role: 'user', text: text));
+    List<String> imageUrls = [];
+    if (images!.isNotEmpty) {
+      // needed due to old list being cleaned up
+      List<File> copiedImages = List.from(images);
+      try {
+        for (File image in copiedImages) {
+          String url = await _firebaseManager.compressUploadSaveImage(image);
+          imageUrls.add(url);
+          _currentChatSession.messages.last.addImageUrl(url);
+        }
+      } catch (error) {
+        throw Exception(
+            'Failed to compress, upload, and save image all images: $error');
+      }
     }
+
+    if (provider == "firebaseVertex") {
+      // TODO get working?
+      // return await _ApiCallFirebaseVertex(message.text);
+    }
+    return await _ApiCallFirebaseCustom();
+    // (provider == "firebaseVertex")
   }
 
   Future<Message?> _ApiCallFirebaseVertex(String text) async {
     try {
       _waitingForResponse = true;
-      GenerateContentResponse result = await _chat
+      GenerateContentResponse result = await _googleChatSessions
           .sendMessage(Content.text(text)); // Adjusted to proper constructor
+
+      // // Read the local image file
+
+      // final imageFile = File('assets/animan512.png');
+      // final imageBytes = await imageFile.readAsBytes();
+      // // final base64Image = base64Encode(imageBytes);
+      // final imagePart = DataPart('image/png', imageBytes);
+
+      // GenerateContentResponse result = await _googleChatSessions.sendMessage(Content.multi(
+      //     [TextPart(text), imagePart])); // Adjusted to proper constructor
 
       if (result.text != null && result.text!.isNotEmpty) {
         final aiResponse = Message(
           time: DateTime.now(),
           role: 'assistant',
-          content: [MessageContent(type: 'text', content: result.text!)],
+          text: result.text!,
         );
 
         addMessage(aiResponse);
@@ -98,18 +125,19 @@ class ChatMessagesProvider with ChangeNotifier {
   }
 
   Future<Message?> _ApiCallFirebaseCustom() async {
+    // NOT WORKING FOR IMAGES, API ONLY ACCEPTS URLs
     try {
-      final result = await FirebaseFunctions.instance
-          .httpsCallable('animalChat')
-          .call(
-              {"messages": _messages.map((msg) => msg.toOpenAIAPI()).toList()});
-      print("MESSAGES OUTPUT");
-      print(_messages.map((msg) => msg.toOpenAIAPI()).toList());
+      final result =
+          await FirebaseFunctions.instance.httpsCallable('animalChat').call({
+        "messages": _currentChatSession.messages
+            .map((msg) => msg.toOpenAIAPI())
+            .toList()
+      });
 
       final aiReponse = Message(
         time: DateTime.now(),
         role: 'assistant',
-        content: [MessageContent(type: 'text', content: result.data)],
+        text: result.data,
       );
 
       addMessage(aiReponse);

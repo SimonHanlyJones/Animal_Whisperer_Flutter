@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Animal_Whisperer/models/current_chat_session.dart';
 import 'package:Animal_Whisperer/services/providers/authentication_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,6 +8,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
+
+import '../models/message.dart';
 
 class FirebaseManager {
   // AuthenticationProvider authenticationProvider =
@@ -65,27 +68,7 @@ class FirebaseManager {
     }
   }
 
-  // Future<void> saveImageUrl(String imageUrl) async {
-  //   try {
-  //     final User? user = _auth.currentUser;
-  //     if (user == null) {
-  //       throw Exception('User not authenticated');
-  //     }
-
-  //     await _firestore
-  //         .collection('users')
-  //         .doc(user.uid)
-  //         .collection('images')
-  //         .add({
-  //       'url': imageUrl,
-  //       'timestamp': FieldValue.serverTimestamp(),
-  //     });
-  //   } catch (e) {
-  //     throw Exception('Failed to save image URL: $e');
-  //   }
-  // }
-
-  Future<String> compressUploadSaveImage(File imageFile) async {
+  Future<String> compressUploadImage(File imageFile) async {
     try {
       // Compress the image
       final File compressedImage = await compressImage(imageFile);
@@ -93,12 +76,106 @@ class FirebaseManager {
       // Upload the compressed image
       final String imageUrl = await uploadImage(compressedImage);
 
-      // Save the image URL to Firestore
-      // await saveImageUrl(imageUrl);
-
       return imageUrl;
     } catch (e) {
       throw Exception('Failed to compress, upload, and save image: $e');
+    }
+  }
+
+  Future<String> saveChatSession(CurrentChatSession session) async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final docRef = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('chatSessions')
+          .add({
+        'title': session.title,
+        'created': session.created,
+        'messages': session.messages
+            .map((message) => {
+                  'time': message.time,
+                  'role': message.role,
+                  'text': message.text,
+                  'imageUrls': message.imageUrls,
+                })
+            .toList(),
+        'systemPrompt': session.systemPrompt,
+      });
+
+      // Optionally return the document ID
+      return docRef.id;
+    } catch (e) {
+      throw Exception('Failed to save chat session: $e');
+    }
+  }
+
+  Future<void> updateChatSessionMessages(
+      String sessionId, List<Message> messages) async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final docRef = _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('chatSessions')
+          .doc(sessionId);
+
+      await docRef.update({
+        'messages': messages
+            .map((message) => {
+                  'time': message.time,
+                  'role': message.role,
+                  'text': message.text,
+                  'imageUrls': message.imageUrls,
+                })
+            .toList(),
+      });
+    } catch (e) {
+      throw Exception('Failed to update chat session messages: $e');
+    }
+  }
+
+  Future<List<CurrentChatSession>> getChatSessions() async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('chatSessions')
+          .orderBy('created', descending: true)
+          .get();
+
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        return CurrentChatSession(
+          title: data['title'],
+          created: (data['created'] as Timestamp).toDate(),
+          messages: (data['messages'] as List<dynamic>).map((message) {
+            final messageData = message as Map<String, dynamic>;
+            return Message(
+              time: (messageData['time'] as Timestamp).toDate(),
+              role: messageData['role'],
+              text: messageData['text'],
+              imageUrls: List<String>.from(messageData['imageUrls']),
+            );
+          }).toList(),
+        );
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to get chat sessions: $e');
     }
   }
 }

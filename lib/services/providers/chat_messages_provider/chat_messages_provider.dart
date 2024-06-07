@@ -6,18 +6,21 @@ import 'package:flutter/material.dart';
 import '../../../models/current_chat_session.dart';
 import '../../../models/message.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
-import 'package:firebase_core/firebase_core.dart';
+
+import 'package:logger/logger.dart';
 
 import '../../firestore_manager.dart';
 
 class ChatMessagesProvider with ChangeNotifier {
-  // List<Message> _messages = [];
   bool _waitingForResponse = false;
   bool _waitingForImages = false;
   late final GenerativeModel _model;
   late final FirebaseVertexAI _vertexAI;
   late final ChatSession _googleChatSessions;
   CurrentChatSession _currentChatSession = CurrentChatSession(messages: []);
+  String currentChatSessionFirestoreId = '';
+  final FirebaseManager _firestoreManager = FirebaseManager();
+  final Logger _logger = Logger();
 
   ChatMessagesProvider() {
     _initializeVertexAIFirebase(_currentChatSession.systemPrompt);
@@ -45,13 +48,35 @@ class ChatMessagesProvider with ChangeNotifier {
   void addMessage(Message message) {
     _currentChatSession.addMessage(message);
     notifyListeners();
+
+    _saveOrUpdateChatSession();
+  }
+
+  Future<void> _saveOrUpdateChatSession() async {
+    try {
+      if (currentChatSessionFirestoreId.isEmpty &&
+          _currentChatSession.messages.length >= 2) {
+        // Save chat session
+        currentChatSessionFirestoreId =
+            await _firestoreManager.saveChatSession(_currentChatSession);
+      } else if (currentChatSessionFirestoreId.isNotEmpty &&
+          _currentChatSession.messages.length >= 2) {
+        // Update chat session
+        await _firestoreManager.updateChatSessionMessages(
+            currentChatSessionFirestoreId, _currentChatSession.messages);
+      }
+    } catch (e, stacktrace) {
+      _logger.e('Failed to save or update chat session',
+          error: e, stackTrace: stacktrace);
+      // _showErrorSnackbar(
+      //     context, 'Failed to save or update chat session. Please try again.');
+    }
   }
 
   Future<Message?> sendMessage(
       {String? text,
       List<File>? images,
       String provider = "firebaseCustom"}) async {
-    final FirebaseManager _firebaseManager = FirebaseManager();
     if (text!.isNotEmpty || images!.isNotEmpty) {
       final lastMessage = _currentChatSession.messages.last;
       final time = DateTime.now();
@@ -65,15 +90,14 @@ class ChatMessagesProvider with ChangeNotifier {
 
     Message message = Message(role: 'user', text: text); // Add message
 
-    _waitingForImages = true;
-    notifyListeners();
-
-    if (images!.isNotEmpty) {
+    if (images != null && images.isNotEmpty) {
+      _waitingForImages = true;
+      notifyListeners();
       // needed due to old list being cleaned up
       List<File> copiedImages = List.from(images);
       try {
         for (File image in copiedImages) {
-          String url = await _firebaseManager.compressUploadSaveImage(image);
+          String url = await _firestoreManager.compressUploadImage(image);
 
           message.addImageUrl(url);
         }
@@ -144,20 +168,16 @@ class ChatMessagesProvider with ChangeNotifier {
             .toList()
       });
 
-      final aiReponse = Message(
+      final aiResponse = Message(
         time: DateTime.now(),
         role: 'assistant',
         text: result.data,
       );
 
-      addMessage(aiReponse);
-      return aiReponse;
+      addMessage(aiResponse);
+      return aiResponse;
     } on FirebaseFunctionsException catch (error) {
-      // TODO: logging framework
-      print(error.code);
-      print(error.details);
-      print(error.message);
-      return null;
+      throw Exception('Failed to call firebase function: $error');
     } finally {
       _waitingForResponse = false;
       notifyListeners();

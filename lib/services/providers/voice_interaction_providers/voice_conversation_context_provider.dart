@@ -67,8 +67,13 @@ class ConversationContext with ChangeNotifier {
         event.recognitionResult != null &&
         // event.recognitionResult!.recognizedWords != null &&
         event.recognitionResult!.recognizedWords.trim().isNotEmpty) {
-      // If debounce is active, ignore this event
       if (_debounceTimerMessage?.isActive == true) return;
+      print("SPEEEEEEEEEEEEEEEECECHHHHHHHCCCCCCCCCCCCCCCCCCCCCCHHHHHH");
+      print("SPEEEEEEEEEEEEEEEECECHHHHHHHCCCCCCCCCCCCCCCCCCCCCCHHHHHH");
+      print("SPEEEEEEEEEEEEEEEECECHHHHHHHCCCCCCCCCCCCCCCCCCCCCCHHHHHH");
+      print("SPEEEEEEEEEEEEEEEECECHHHHHHHCCCCCCCCCCCCCCCCCCCCCCHHHHHH");
+      print("SPEEEEEEEEEEEEEEEECECHHHHHHHCCCCCCCCCCCCCCCCCCCCCCHHHHHH");
+      print("SPEEEEEEEEEEEEEEEECECHHHHHHHCCCCCCCCCCCCCCCCCCCCCCHHHHHH");
 
       _debounceTimerMessage = Timer(Duration(milliseconds: 300), () {});
       // Send the message

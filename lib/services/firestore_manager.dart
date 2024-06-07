@@ -65,25 +65,25 @@ class FirebaseManager {
     }
   }
 
-  Future<void> saveImageUrl(String imageUrl) async {
-    try {
-      final User? user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('User not authenticated');
-      }
+  // Future<void> saveImageUrl(String imageUrl) async {
+  //   try {
+  //     final User? user = _auth.currentUser;
+  //     if (user == null) {
+  //       throw Exception('User not authenticated');
+  //     }
 
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('images')
-          .add({
-        'url': imageUrl,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      throw Exception('Failed to save image URL: $e');
-    }
-  }
+  //     await _firestore
+  //         .collection('users')
+  //         .doc(user.uid)
+  //         .collection('images')
+  //         .add({
+  //       'url': imageUrl,
+  //       'timestamp': FieldValue.serverTimestamp(),
+  //     });
+  //   } catch (e) {
+  //     throw Exception('Failed to save image URL: $e');
+  //   }
+  // }
 
   Future<String> compressUploadSaveImage(File imageFile) async {
     try {
@@ -99,87 +99,6 @@ class FirebaseManager {
       return imageUrl;
     } catch (e) {
       throw Exception('Failed to compress, upload, and save image: $e');
-    }
-  }
-
-  Future<void> saveChatMessage(
-      String chatId, String role, String text, List<String> imageUrls) async {
-    try {
-      final User? user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('User not authenticated');
-      }
-
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('chats')
-          .doc(chatId)
-          .collection('messages')
-          .add({
-        'role': role,
-        'text': text,
-        'imageUrls': imageUrls,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      throw Exception('Failed to save chat message: $e');
-    }
-  }
-
-  Future<void> saveChatSession(
-      String chatId, DateTime secondMessageTimestamp) async {
-    try {
-      final User? user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('User not authenticated');
-      }
-
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('chats')
-          .doc(chatId)
-          .set({
-        'timestamp': secondMessageTimestamp,
-      });
-    } catch (e) {
-      throw Exception('Failed to save chat session: $e');
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> fetchChatHistory() async {
-    try {
-      final User? user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('User not authenticated');
-      }
-
-      final querySnapshot = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('chats')
-          .orderBy('timestamp', descending: false)
-          .get();
-
-      List<Map<String, dynamic>> chatHistory = [];
-      for (var doc in querySnapshot.docs) {
-        final messagesSnapshot = await doc.reference
-            .collection('messages')
-            .orderBy('timestamp')
-            .get();
-        List<Map<String, dynamic>> messages = messagesSnapshot.docs
-            .map((messageDoc) => messageDoc.data())
-            .toList();
-        chatHistory.add({
-          'chatId': doc.id,
-          'messages': messages,
-        });
-      }
-
-      return chatHistory;
-    } catch (e) {
-      throw Exception('Failed to fetch chat history: $e');
     }
   }
 }

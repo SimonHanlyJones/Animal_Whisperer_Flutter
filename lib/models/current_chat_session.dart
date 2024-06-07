@@ -15,11 +15,15 @@ class CurrentChatSession {
         messages = messages ?? [] {
     // Add the system message if the messages list is empty
     if (this.messages.isEmpty) {
-      addMessage(Message(role: 'system', text: systemPrompt));
+      _addSystemMessage(Message(role: 'system', text: systemPrompt));
     }
   }
 
   void addMessage(Message message) {
+    messages.add(message);
+  }
+
+  void _addSystemMessage(Message message) {
     messages.add(message);
   }
 }

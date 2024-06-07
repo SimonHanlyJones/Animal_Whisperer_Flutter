@@ -286,12 +286,17 @@ class text_chat_bubbles_builder extends StatelessWidget {
       child: ListView.builder(
           controller: _scrollController,
           itemCount: chatMessagesProvider.messages.length +
-              (chatMessagesProvider.waitingForResponse ? 1 : 0),
+              (chatMessagesProvider.waitingForResponse ? 1 : 0) +
+              (chatMessagesProvider.waitingForImages ? 1 : 0),
           itemBuilder: (context, index) {
             Widget card;
-            if (index >= chatMessagesProvider.messages.length) {
+            if (index >= chatMessagesProvider.messages.length &&
+                chatMessagesProvider.waitingForResponse) {
               // This is the additional loading message
               return FadeInListItem(child: AssistantLoadingCard());
+            } else if (index >= chatMessagesProvider.messages.length &&
+                chatMessagesProvider.waitingForImages) {
+              return FadeInListItem(child: UserLoadingCard());
             }
             final message = chatMessagesProvider.messages[index];
             if (message.role == 'assistant') {

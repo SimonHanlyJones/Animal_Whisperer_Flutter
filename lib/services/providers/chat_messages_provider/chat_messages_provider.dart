@@ -13,6 +13,7 @@ import '../../firestore_manager.dart';
 class ChatMessagesProvider with ChangeNotifier {
   // List<Message> _messages = [];
   bool _waitingForResponse = false;
+  bool _waitingForImages = false;
   late final GenerativeModel _model;
   late final FirebaseVertexAI _vertexAI;
   late final ChatSession _googleChatSessions;
@@ -39,6 +40,7 @@ class ChatMessagesProvider with ChangeNotifier {
 
   List<Message> get messages => _currentChatSession.messages;
   bool get waitingForResponse => _waitingForResponse;
+  bool get waitingForImages => _waitingForImages;
 
   void addMessage(Message message) {
     _currentChatSession.addMessage(message);
@@ -60,25 +62,33 @@ class ChatMessagesProvider with ChangeNotifier {
         return null;
       }
     }
-    _waitingForResponse = true;
+
+    Message message = Message(role: 'user', text: text); // Add message
+
+    _waitingForImages = true;
     notifyListeners();
 
-    addMessage(Message(role: 'user', text: text));
-    List<String> imageUrls = [];
     if (images!.isNotEmpty) {
       // needed due to old list being cleaned up
       List<File> copiedImages = List.from(images);
       try {
         for (File image in copiedImages) {
           String url = await _firebaseManager.compressUploadSaveImage(image);
-          imageUrls.add(url);
-          _currentChatSession.messages.last.addImageUrl(url);
+
+          message.addImageUrl(url);
         }
       } catch (error) {
         throw Exception(
             'Failed to compress, upload, and save image all images: $error');
+      } finally {
+        _waitingForImages = false;
+        notifyListeners();
       }
     }
+
+    _waitingForResponse = true;
+    notifyListeners();
+    addMessage(message);
 
     if (provider == "firebaseVertex") {
       // TODO get working?
@@ -91,6 +101,7 @@ class ChatMessagesProvider with ChangeNotifier {
   Future<Message?> _ApiCallFirebaseVertex(String text) async {
     try {
       _waitingForResponse = true;
+      notifyListeners();
       GenerateContentResponse result = await _googleChatSessions
           .sendMessage(Content.text(text)); // Adjusted to proper constructor
 
@@ -116,8 +127,7 @@ class ChatMessagesProvider with ChangeNotifier {
       }
       return null; // Return null if no text is found
     } catch (e) {
-      print("An error occurred: $e"); // Log or handle the error as needed
-      return null; // Optionally handle the error by returning a default message or null
+      throw Exception('Failed to get ai response: $e');
     } finally {
       _waitingForResponse = false;
       notifyListeners(); // Notify listeners to update UI or state

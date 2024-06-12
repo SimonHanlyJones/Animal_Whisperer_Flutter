@@ -1,4 +1,5 @@
 import 'package:Animal_Whisperer/services/providers/voice_interaction_providers/synthesis_provider.dart';
+import 'package:Animal_Whisperer/theme/gradient_container.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text_provider.dart';
@@ -63,16 +64,7 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
   Widget build(BuildContext context) {
     var recognitionProvider = Provider.of<SpeechToTextProvider>(context);
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomLeft,
-          colors: [
-            Theme.of(context).colorScheme.surfaceContainer,
-            Theme.of(context).colorScheme.surfaceContainerHigh,
-          ], // Customize your gradient colors here
-        )),
+      body: GradientContainer(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [

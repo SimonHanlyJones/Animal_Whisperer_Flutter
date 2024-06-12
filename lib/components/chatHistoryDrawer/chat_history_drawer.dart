@@ -1,3 +1,5 @@
+import 'package:Animal_Whisperer/services/providers/chat_messages_provider/chat_messages_provider.dart';
+import 'package:Animal_Whisperer/theme/gradient_container.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/providers/authentication_provider.dart';
@@ -8,30 +10,34 @@ class ChatHistoryDrawer extends StatelessWidget {
     final authProvider = Provider.of<AuthenticationProvider>(context);
 
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            decoration:
-                BoxDecoration(color: Theme.of(context).colorScheme.primary),
-            child: Text(
-              'Chat History',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.secondary,
-                fontSize: 24,
+      child: GradientContainer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration:
+                  BoxDecoration(color: Theme.of(context).colorScheme.primary),
+              child: Text(
+                'Tail Tales',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontSize: 24,
+                ),
               ),
             ),
-          ),
-          authProvider.currentUser != null
-              ? _buildUserDrawer(context)
-              : _buildSignInDrawer(context),
-        ],
+            authProvider.currentUser != null
+                ? _buildUserDrawer(context)
+                : _buildSignInDrawer(context),
+          ],
+        ),
       ),
     );
   }
 
   // Drawer content for signed in user
   Widget _buildUserDrawer(BuildContext context) {
+    final ChatMessagesProvider chatMessagesProvider =
+        Provider.of<ChatMessagesProvider>(context);
     return Column(
       children: <Widget>[
         ListTile(
@@ -67,6 +73,54 @@ class ChatHistoryDrawer extends StatelessWidget {
             Navigator.pop(context); // Optionally close the drawer
           },
         ),
+        ...chatMessagesProvider.chatHistory.map((session) {
+          return GestureDetector(
+            onLongPress: () async {
+              bool? confirmDelete = await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("Delete Chat"),
+                    content: Text("Are you sure you want to delete this chat?"),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text("Cancel"),
+                        onPressed: () {
+                          Navigator.of(context).pop(false);
+                        },
+                      ),
+                      TextButton(
+                        child: Text("Delete"),
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (confirmDelete == true) {
+                chatMessagesProvider.deleteChatSession(session.id);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Chat deleted')),
+                );
+              }
+            },
+            child: ListTile(
+              title: Text(session.title ?? "Title Tinkering...",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  )),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                chatMessagesProvider.loadChatFromHistory(session.id);
+              },
+            ),
+          );
+        }).toList(),
       ],
     );
   }

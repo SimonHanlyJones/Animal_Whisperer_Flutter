@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -13,7 +12,7 @@ abstract class BaseAssistantCard extends StatelessWidget {
 
   BaseAssistantCard({
     required this.buildChild,
-    this.fixedWidth = false, // By default, it behaves dynamically
+    this.fixedWidth = false,
     this.alignment = Alignment.centerLeft,
   });
 
@@ -62,11 +61,13 @@ class AssistantMessageCard extends BaseAssistantCard {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (message.text != null && message.text!.isNotEmpty)
-                Text(
-                  message.text!,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onTertiary,
-                    fontSize: 16,
+                MarkdownBody(
+                  data: message.text!,
+                  styleSheet: MarkdownStyleSheet(
+                    p: TextStyle(
+                      color: Theme.of(context).colorScheme.onTertiary,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ...message.imageUrls.map((imageUrl) {

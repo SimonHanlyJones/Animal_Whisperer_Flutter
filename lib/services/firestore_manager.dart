@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
+import '../models/chat_session_summary.dart';
 import '../models/message.dart';
 
 class FirebaseManager {
@@ -18,6 +19,45 @@ class FirebaseManager {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> deleteChatSession(String sessionId) async {
+    try {
+      // Fetch the chat session
+      CurrentChatSession session = await getChatSession(sessionId);
+
+      // Extract image URLs
+      List<String> imageUrls =
+          session.messages.expand((message) => message.imageUrls).toList();
+
+      // Delete images
+      await _deleteImages(imageUrls);
+
+      // Delete chat session from Firestore
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('chatSessions')
+          .doc(sessionId)
+          .delete();
+    } catch (e) {
+      throw Exception('Failed to delete chat session: $e');
+    }
+  }
+
+  Future<void> _deleteImages(List<String> imageUrls) async {
+    try {
+      for (String url in imageUrls) {
+        await _storage.refFromURL(url).delete();
+      }
+    } catch (e) {
+      throw Exception('Failed to delete images: $e');
+    }
+  }
 
   Future<File> compressImage(File imageFile) async {
     final tempDir = await getTemporaryDirectory();
@@ -47,7 +87,7 @@ class FirebaseManager {
       }
 
       // Define the storage reference
-// Upload the image to "user/<UID>/path/to/file"
+      // Upload the image to "user/<UID>/path/to/file"
       final Reference storageRef = _storage.ref().child(
           'user/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg');
       // Upload the image
@@ -143,7 +183,30 @@ class FirebaseManager {
     }
   }
 
-  Future<List<CurrentChatSession>> getChatSessions() async {
+  Future<void> updateChatSessionTitle(
+      String sessionId, CurrentChatSession chatSession) async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+      if (chatSession.title == null || chatSession.title!.isEmpty) {
+        return;
+      }
+
+      final docRef = _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('chatSessions')
+          .doc(sessionId);
+
+      await docRef.update({'title': chatSession.title});
+    } catch (e) {
+      throw Exception('Failed to update chat session title: $e');
+    }
+  }
+
+  Future<List<ChatSessionSummary>> getChatHistory() async {
     try {
       final User? user = _auth.currentUser;
       if (user == null) {
@@ -160,22 +223,52 @@ class FirebaseManager {
       return snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
 
-        return CurrentChatSession(
+        return ChatSessionSummary(
+          id: doc.id,
           title: data['title'],
           created: (data['created'] as Timestamp).toDate(),
-          messages: (data['messages'] as List<dynamic>).map((message) {
-            final messageData = message as Map<String, dynamic>;
-            return Message(
-              time: (messageData['time'] as Timestamp).toDate(),
-              role: messageData['role'],
-              text: messageData['text'],
-              imageUrls: List<String>.from(messageData['imageUrls']),
-            );
-          }).toList(),
         );
       }).toList();
     } catch (e) {
-      throw Exception('Failed to get chat sessions: $e');
+      throw Exception('Failed to get chat session summaries: $e');
+    }
+  }
+
+  Future<CurrentChatSession> getChatSession(String sessionId) async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final DocumentSnapshot doc = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('chatSessions')
+          .doc(sessionId)
+          .get();
+
+      if (!doc.exists) {
+        throw Exception('Chat session not found');
+      }
+
+      final data = doc.data() as Map<String, dynamic>;
+
+      return CurrentChatSession(
+        title: data['title'],
+        created: (data['created'] as Timestamp).toDate(),
+        messages: (data['messages'] as List<dynamic>).map((message) {
+          final messageData = message as Map<String, dynamic>;
+          return Message(
+            time: (messageData['time'] as Timestamp).toDate(),
+            role: messageData['role'],
+            text: messageData['text'],
+            imageUrls: List<String>.from(messageData['imageUrls']),
+          );
+        }).toList(),
+      );
+    } catch (e) {
+      throw Exception('Failed to get chat session details: $e');
     }
   }
 }

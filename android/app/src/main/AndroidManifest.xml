@@ -7,7 +7,7 @@ package="com.example.animalwhisperer">
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
 
     <application
-        android:label="animal_whisperer_flutter"
+        android:label="Animal Whisperer"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

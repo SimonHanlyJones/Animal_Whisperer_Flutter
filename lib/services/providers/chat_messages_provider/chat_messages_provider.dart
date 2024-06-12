@@ -1,14 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import '../../../models/chat_session_summary.dart';
 import '../../../models/current_chat_session.dart';
 import '../../../models/message.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
-
 import 'package:logger/logger.dart';
-
 import '../../firestore_manager.dart';
 
 class ChatMessagesProvider with ChangeNotifier {
@@ -22,8 +19,77 @@ class ChatMessagesProvider with ChangeNotifier {
   final FirebaseManager _firestoreManager = FirebaseManager();
   final Logger _logger = Logger();
 
+  late List<ChatSessionSummary> _chatHistory;
+  List<ChatSessionSummary> get chatHistory => _chatHistory;
+
   ChatMessagesProvider() {
     _initializeVertexAIFirebase(_currentChatSession.systemPrompt);
+    _initializeChatHistory();
+  }
+
+  Future<void> deleteChatSession(String fireStoreSessionId) async {
+    try {
+      _firestoreManager.deleteChatSession(fireStoreSessionId);
+
+      // Update current chat session if necessary
+      if (currentChatSessionFirestoreId == fireStoreSessionId) {
+        currentChatSessionFirestoreId = '';
+        _currentChatSession = CurrentChatSession(messages: []);
+      }
+
+      await _initializeChatHistory();
+      notifyListeners();
+    } catch (e) {
+      _logger.e('Failed to delete chat session: $e');
+    }
+  }
+
+  Future<void> _initializeChatHistory() async {
+    _chatHistory = await _firestoreManager.getChatHistory();
+    notifyListeners();
+  }
+
+  Future<String?> _getTitle() async {
+    if (_currentChatSession.messages.length < 2 ||
+        _currentChatSession.title != null ||
+        currentChatSessionFirestoreId.isEmpty) {
+      return null;
+    }
+    Message titleMessage = Message(
+        role: "system",
+        text:
+            "You are a creative title generator. Your job is to read the following chat exchange and provide a funny title for the conversation that is no more than 5 words. Do so in a funny, overenthusiastic, Australian manner like a famous Australian Crocodile Hunter. Include any plausible animal reference and attempt to alliterate if possible. The goal is fun and humor rather than precision.");
+    List<Message> messagesCopy = List.from(_currentChatSession.messages);
+    messagesCopy[0] = titleMessage;
+
+    try {
+      Message? title = await _ApiCallFirebaseCustom(messagesCopy);
+      if (title != null) {
+        _currentChatSession.title = title.text;
+        _firestoreManager.updateChatSessionTitle(
+            currentChatSessionFirestoreId, _currentChatSession);
+
+        _chatHistory = await _firestoreManager.getChatHistory();
+        notifyListeners();
+        return title.text;
+      }
+    } catch (e, stacktrace) {
+      _logger.e('Failed to fetch title', error: e, stackTrace: stacktrace);
+    }
+
+    return null;
+  }
+
+  startNewChat() {
+    _currentChatSession = CurrentChatSession(messages: []);
+    currentChatSessionFirestoreId = '';
+    notifyListeners();
+  }
+
+  Future<void> loadChatFromHistory(String chatSessionId) async {
+    _currentChatSession = await _firestoreManager.getChatSession(chatSessionId);
+    currentChatSessionFirestoreId = chatSessionId;
+    notifyListeners();
   }
 
   Future<void> _initializeVertexAIFirebase(String system_prompt) async {
@@ -47,9 +113,12 @@ class ChatMessagesProvider with ChangeNotifier {
 
   void addMessage(Message message) {
     _currentChatSession.addMessage(message);
-    notifyListeners();
 
-    _saveOrUpdateChatSession();
+    // only save messages after the AI has responded
+    if (message.role == 'assistant') {
+      _saveOrUpdateChatSession();
+    }
+    notifyListeners();
   }
 
   Future<void> _saveOrUpdateChatSession() async {
@@ -59,6 +128,8 @@ class ChatMessagesProvider with ChangeNotifier {
         // Save chat session
         currentChatSessionFirestoreId =
             await _firestoreManager.saveChatSession(_currentChatSession);
+        _chatHistory = await _firestoreManager.getChatHistory();
+        notifyListeners();
       } else if (currentChatSessionFirestoreId.isNotEmpty &&
           _currentChatSession.messages.length >= 2) {
         // Update chat session
@@ -71,6 +142,9 @@ class ChatMessagesProvider with ChangeNotifier {
       // _showErrorSnackbar(
       //     context, 'Failed to save or update chat session. Please try again.');
     }
+
+    // Update title
+    _getTitle();
   }
 
   Future<Message?> sendMessage(
@@ -118,8 +192,13 @@ class ChatMessagesProvider with ChangeNotifier {
       // TODO get working?
       // return await _ApiCallFirebaseVertex(message.text);
     }
-    return await _ApiCallFirebaseCustom();
-    // (provider == "firebaseVertex")
+    Message? aiResponse =
+        await _ApiCallFirebaseCustom(_currentChatSession.messages);
+    if (aiResponse != null) {
+      addMessage(aiResponse);
+      return aiResponse;
+    }
+    return null;
   }
 
   Future<Message?> _ApiCallFirebaseVertex(String text) async {
@@ -128,16 +207,6 @@ class ChatMessagesProvider with ChangeNotifier {
       notifyListeners();
       GenerateContentResponse result = await _googleChatSessions
           .sendMessage(Content.text(text)); // Adjusted to proper constructor
-
-      // // Read the local image file
-
-      // final imageFile = File('assets/animan512.png');
-      // final imageBytes = await imageFile.readAsBytes();
-      // // final base64Image = base64Encode(imageBytes);
-      // final imagePart = DataPart('image/png', imageBytes);
-
-      // GenerateContentResponse result = await _googleChatSessions.sendMessage(Content.multi(
-      //     [TextPart(text), imagePart])); // Adjusted to proper constructor
 
       if (result.text != null && result.text!.isNotEmpty) {
         final aiResponse = Message(
@@ -158,15 +227,12 @@ class ChatMessagesProvider with ChangeNotifier {
     }
   }
 
-  Future<Message?> _ApiCallFirebaseCustom() async {
-    // NOT WORKING FOR IMAGES, API ONLY ACCEPTS URLs
+  Future<Message?> _ApiCallFirebaseCustom(messages) async {
     try {
-      final result =
-          await FirebaseFunctions.instance.httpsCallable('animalChat').call({
-        "messages": _currentChatSession.messages
-            .map((msg) => msg.toOpenAIAPI())
-            .toList()
-      });
+      final result = await FirebaseFunctions.instance
+          .httpsCallable('animalChat')
+          .call(
+              {"messages": messages.map((msg) => msg.toOpenAIAPI()).toList()});
 
       final aiResponse = Message(
         time: DateTime.now(),
@@ -174,7 +240,6 @@ class ChatMessagesProvider with ChangeNotifier {
         text: result.data,
       );
 
-      addMessage(aiResponse);
       return aiResponse;
     } on FirebaseFunctionsException catch (error) {
       throw Exception('Failed to call firebase function: $error');

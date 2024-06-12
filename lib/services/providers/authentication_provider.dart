@@ -29,6 +29,16 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> createAccountWithEmail(String email, String password) async {
+    try {
+      await _firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
+    } catch (e) {
+      // Handle errors, possibly converting them to a more user-friendly format
+      throw Exception('Failed to create account: $e');
+    }
+  }
+
   Future<void> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();

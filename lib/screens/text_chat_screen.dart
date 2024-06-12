@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Animal_Whisperer/models/message.dart';
 import 'package:Animal_Whisperer/services/providers/authentication_provider.dart';
+import 'package:Animal_Whisperer/theme/gradient_container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -26,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   List<File> _pickedImagesForMessage = [];
-  final ImagePicker _picker = ImagePicker();
+  // final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -43,19 +44,18 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _pickedImagesForMessage.add(File(image.path));
-      });
-    }
-  }
-
   void _removeImage(int index) {
     setState(() {
       _pickedImagesForMessage.removeAt(index);
     });
+  }
+
+  void _addImage(File? image) {
+    if (image != null) {
+      setState(() {
+        _pickedImagesForMessage.add(image);
+      });
+    }
   }
 
   void _scrollToBottom() {
@@ -104,24 +104,23 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       drawer: ChatHistoryDrawer(),
       appBar: AppBar(
-          // leading: Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child:
-          //       Image.asset('assets/play_store_512.png'), // Path to your logo
-          // ),
-          title: Text('The Animal Whisperer'),
-          centerTitle: true),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomLeft,
-            colors: [
-              Theme.of(context).colorScheme.surfaceContainer,
-              Theme.of(context).colorScheme.surfaceContainerHigh,
-            ], // Customize your gradient colors here
+        // leading: Padding(
+        //   padding: const EdgeInsets.all(8.0),
+        //   child:
+        //       Image.asset('assets/play_store_512.png'), // Path to your logo
+        // ),
+        title: Text('The Animal Whisperer'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.post_add),
+            onPressed: () {
+              chatMessagesProvider.startNewChat();
+            },
           ),
-        ),
+        ],
+      ),
+      body: GradientContainer(
         child: Column(
           children: [
             text_chat_bubbles_builder(
@@ -148,12 +147,13 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           Row(
             children: [
-              IconButton(
-                  icon: Icon(
-                    Icons.image,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                  onPressed: _pickImage),
+              Row(
+                children: [
+                  ExpandableButtonWidget(
+                    addImage: _addImage,
+                  )
+                ],
+              ),
               Flexible(
                 child: Container(
                   decoration: BoxDecoration(
@@ -171,7 +171,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           maxLines: 5,
                           minLines: 1,
                           decoration: InputDecoration.collapsed(
-                            hintText: "Send a message",
+                            hintText: "Message",
                             hintStyle: TextStyle(
                               color: Theme.of(context).colorScheme.onSecondary,
                             ),
@@ -195,23 +195,98 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
               ),
-              IconButton(
-                  icon: Icon(Icons.phone,
-                      color: Theme.of(context).colorScheme.secondary),
-                  onPressed: () {
-                    _focusNode.unfocus();
-                    Future.delayed(Duration(milliseconds: 300), () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ConversationScreen()),
-                      );
-                    });
-                  })
             ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class ExpandableButtonWidget extends StatefulWidget {
+  ExpandableButtonWidget({
+    super.key,
+    required this.addImage,
+  });
+  final Function(File?) addImage;
+
+  @override
+  State<ExpandableButtonWidget> createState() => _ExpandableButtonWidgetState();
+}
+
+class _ExpandableButtonWidgetState extends State<ExpandableButtonWidget> {
+  bool _isExpanded = false;
+
+  final ImagePicker _picker = ImagePicker();
+
+  void _captureImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    if (image != null) {
+      this.widget.addImage(File(image.path));
+    }
+  }
+
+  void _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      this.widget.addImage(File(image.path));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          width: _isExpanded ? 146 : 0,
+          child: Row(
+            children: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.photo_camera,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                onPressed: _captureImage,
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.image,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                onPressed: _pickImage,
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.phone,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                onPressed: () {
+                  Future.delayed(Duration(milliseconds: 300), () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ConversationScreen(),
+                      ),
+                    );
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        IconButton.filled(
+          icon: Icon(_isExpanded ? Icons.cancel : Icons.add_circle),
+          color: Theme.of(context).colorScheme.secondary,
+          iconSize: 32,
+          onPressed: () {
+            setState(() {
+              _isExpanded = !_isExpanded;
+            });
+          },
+        ),
+      ],
     );
   }
 }

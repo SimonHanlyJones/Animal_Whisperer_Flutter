@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text_provider.dart';
 
-import '../../services/providers/chat_messages_provider/chat_messages_provider.dart';
-import '../../services/providers/voice_interaction_providers/voice_conversation_context_provider.dart';
+import '../../../../services/providers/chat_messages_provider/chat_messages_provider.dart';
+import '../../../../services/providers/voice_interaction_providers/voice_conversation_context_provider.dart';
 import 'assistant_voice_conversation_card.dart';
 
 class ConversationScreenUI extends StatefulWidget {
@@ -84,6 +84,7 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
               isConversationActive: conversationContext.isConversation,
               isListening: recognitionProvider.isListening,
               isWaitingForResponse: chatMessagesProvider.waitingForResponse,
+              isSpeaking: synthesisProvider.isSynthesizing,
             ),
             Expanded(
               child: Container(),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/sign_in_screen.dart';
-import 'screens/text_chat_screen.dart';
+import 'screens/signIn/sign_in_screen.dart';
+import 'screens/chat/textChat/text_chat_screen.dart';
 import 'services/providers/authentication_provider.dart';
 import 'services/providers/multiprovider_setup.dart';
 import 'theme/theme.dart';

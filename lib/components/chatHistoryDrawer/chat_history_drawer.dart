@@ -10,25 +10,32 @@ class ChatHistoryDrawer extends StatelessWidget {
     final authProvider = Provider.of<AuthenticationProvider>(context);
 
     return Drawer(
-      child: GradientContainer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration:
-                  BoxDecoration(color: Theme.of(context).colorScheme.primary),
-              child: Text(
-                'Tail Tales',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
-                  fontSize: 24,
+      child: Container(
+        child: GradientContainer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              SizedBox(
+                height: 144,
+                child: Container(
+                  child: DrawerHeader(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary),
+                    child: Text(
+                      'Tail Tales',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            authProvider.currentUser != null
-                ? _buildUserDrawer(context)
-                : _buildSignInDrawer(context),
-          ],
+              authProvider.currentUser != null
+                  ? _buildUserDrawer(context)
+                  : _buildSignInDrawer(context),
+            ],
+          ),
         ),
       ),
     );
@@ -40,39 +47,6 @@ class ChatHistoryDrawer extends StatelessWidget {
         Provider.of<ChatMessagesProvider>(context);
     return Column(
       children: <Widget>[
-        ListTile(
-          leading: Icon(Icons.home),
-          title: Text('Home'),
-          onTap: () {
-            Navigator.pop(context); // Close the drawer
-            // Navigate to Home or any other action
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.account_circle),
-          title: Text('Profile'),
-          onTap: () {
-            Navigator.pop(context); // Close the drawer
-            // Navigate to Profile or any other action
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.settings),
-          title: Text('Settings'),
-          onTap: () {
-            Navigator.pop(context); // Close the drawer
-            // Navigate to Settings or any other action
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.exit_to_app),
-          title: Text('Sign Out'),
-          onTap: () {
-            Provider.of<AuthenticationProvider>(context, listen: false)
-                .signOut();
-            Navigator.pop(context); // Optionally close the drawer
-          },
-        ),
         ...chatMessagesProvider.chatHistory.map((session) {
           return GestureDetector(
             onLongPress: () async {
@@ -102,25 +76,40 @@ class ChatHistoryDrawer extends StatelessWidget {
 
               if (confirmDelete == true) {
                 chatMessagesProvider.deleteChatSession(session.id);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Chat deleted')),
-                );
               }
             },
-            child: ListTile(
-              title: Text(session.title ?? "Title Tinkering...",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  )),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                chatMessagesProvider.loadChatFromHistory(session.id);
-              },
+            child: Container(
+              // color: Theme.of(context).colorScheme.secondary,
+              padding: EdgeInsets.all(10),
+              margin: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: ListTile(
+                title: Text(session.title ?? "Title Tinkering...",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    )),
+                onTap: () {
+                  Navigator.pop(context); // Close the drawer
+                  chatMessagesProvider.loadChatFromHistory(session.id);
+                },
+              ),
             ),
           );
         }).toList(),
+        ListTile(
+          leading: Icon(Icons.exit_to_app),
+          title: Text('Sign Out'),
+          onTap: () {
+            Provider.of<AuthenticationProvider>(context, listen: false)
+                .signOut();
+            Navigator.pop(context); // Optionally close the drawer
+          },
+        ),
       ],
     );
   }

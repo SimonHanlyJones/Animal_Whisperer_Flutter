@@ -2,7 +2,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import '../../models/message.dart';
+import '../../../../models/message.dart';
 
 // Base class for common styling and properties
 abstract class BaseAssistantCard extends StatelessWidget {

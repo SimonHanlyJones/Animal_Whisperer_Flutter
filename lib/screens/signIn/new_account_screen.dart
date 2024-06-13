@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../services/providers/authentication_provider.dart';
-import '../theme/gradient_container.dart';
-import 'new_account_screen.dart';
+import '../../services/providers/authentication_provider.dart';
+import '../../theme/gradient_container.dart';
 
-class SignInPage extends StatelessWidget {
+class newAccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController emailController = TextEditingController();
@@ -13,7 +12,7 @@ class SignInPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sign In"),
+        title: Text("Register"),
       ),
       body: GradientContainer(
         child: Padding(
@@ -38,46 +37,22 @@ class SignInPage extends StatelessWidget {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  // Sign in with email and password
+                  // Create account with email and password
                   try {
                     await Provider.of<AuthenticationProvider>(context,
                             listen: false)
-                        .signInWithEmail(
+                        .createAccountWithEmail(
                             emailController.text, passwordController.text);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Account created successfully')),
+                    );
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to sign in: $e')),
+                      SnackBar(content: Text('Failed to create account: $e')),
                     );
                   }
                 },
-                child: Text('Sign In with Email'),
-              ),
-              SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () async {
-                  // Sign in with Google
-                  try {
-                    await Provider.of<AuthenticationProvider>(context,
-                            listen: false)
-                        .signInWithGoogle();
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text('Failed to sign in with Google: $e')),
-                    );
-                  }
-                },
-                child: Text('Sign In with Google'),
-              ),
-              SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => newAccountScreen()),
-                  );
-                },
-                child: Text('Create an Account'),
+                child: Text('Create Account'),
               ),
             ],
           ),

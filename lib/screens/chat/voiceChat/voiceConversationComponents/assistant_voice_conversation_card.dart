@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../chatUIcomponents/assistant_message_card.dart';
+import '../../textChat/textChatComponents/assistant_message_card.dart';
 
 class AssistantVoiceConversationInfoCard extends BaseAssistantCard {
   final String text;
@@ -28,12 +28,14 @@ class ConditionalAssistantCard extends StatelessWidget {
   final bool isConversationActive;
   final bool isListening;
   final bool isWaitingForResponse;
+  final bool isSpeaking;
 
   const ConditionalAssistantCard({
     Key? key,
     required this.isConversationActive,
     required this.isListening,
     required this.isWaitingForResponse,
+    required this.isSpeaking,
   }) : super(key: key);
 
   @override
@@ -49,6 +51,8 @@ class ConditionalAssistantCard extends StatelessWidget {
       return "I'm listening to what you're saying mate\n";
     } else if (isWaitingForResponse) {
       return "Hmm, just give me a sec to think about that\n";
+    } else if (isSpeaking) {
+      return "... Speaking ...\n";
     }
     return "\n\n"; // Return empty string if no conditions are met
   }

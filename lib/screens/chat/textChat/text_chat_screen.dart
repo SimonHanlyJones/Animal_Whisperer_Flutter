@@ -1,21 +1,16 @@
 import 'dart:io';
 
-import 'package:Animal_Whisperer/models/message.dart';
-import 'package:Animal_Whisperer/services/providers/authentication_provider.dart';
 import 'package:Animal_Whisperer/theme/gradient_container.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:provider/provider.dart';
-import '../components/chatHistoryDrawer/chat_history_drawer.dart';
-import '../components/chatUIcomponents/assistant_message_card.dart';
-import '../components/chatUIcomponents/message_card_fade_in.dart';
-import '../components/chatUIcomponents/user_message_card.dart';
-import '../services/providers/chat_messages_provider/chat_messages_provider.dart';
-import 'voice_conversation_screen.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import '../../../components/chatHistoryDrawer/chat_history_drawer.dart';
+import 'textChatComponents/assistant_message_card.dart';
+import 'textChatComponents/message_card_fade_in.dart';
+import 'textChatComponents/user_message_card.dart';
+import '../../../services/providers/chat_messages_provider/chat_messages_provider.dart';
+import '../voiceChat/voice_conversation_screen.dart';
 import 'package:image_picker/image_picker.dart';
-import '../services/firestore_manager.dart';
 
 class ChatScreen extends StatefulWidget {
   @override

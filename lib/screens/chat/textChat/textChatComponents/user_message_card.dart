@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/message.dart';
+import '../../../../models/message.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 // Base class for common styling and properties

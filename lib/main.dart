@@ -16,10 +16,12 @@ void main() async {
   );
   await dotenv.load(fileName: ".env");
 
-  runApp(AppProviders());
+  runApp(const AppProviders());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context);
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
       title: 'The Animal Whisperer',
       theme: AppTheme.greenTheme,
       home: SelectionArea(
-        child: authProvider.currentUser != null ? ChatScreen() : SignInPage(),
+        child: authProvider.currentUser != null ? const ChatScreen() : const SignInPage(),
       ),
     );
   }

@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'package:Animal_Whisperer/models/current_chat_session.dart';
-import 'package:Animal_Whisperer/services/providers/authentication_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
-import 'package:provider/provider.dart';
 
 import '../models/chat_session_summary.dart';
 import '../models/message.dart';

@@ -9,6 +9,8 @@ import '../../../../services/providers/voice_interaction_providers/voice_convers
 import 'assistant_voice_conversation_card.dart';
 
 class ConversationScreenUI extends StatefulWidget {
+  const ConversationScreenUI({super.key});
+
   @override
   State<ConversationScreenUI> createState() => _ConversationScreenUIState();
 }
@@ -72,9 +74,9 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
             Center(
               child: RotationTransition(
                 turns: _animation!,
-                child: CircleAvatar(
+                child: const CircleAvatar(
                   radius: 200.0,
-                  backgroundColor: const Color.fromARGB(0, 255, 255, 255),
+                  backgroundColor: Color.fromARGB(0, 255, 255, 255),
                   backgroundImage: AssetImage(
                       'assets/animan512.png'), // Make sure to add your image in the assets folder
                 ),
@@ -91,7 +93,7 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
             ), // Spacing between mic visualizer and text
             // Conditional text
             _mic_visualiser(recognitionProvider: recognitionProvider),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             _voice_conversation_footer(context),
           ],
@@ -104,7 +106,6 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
 
 class _mic_visualiser extends StatelessWidget {
   const _mic_visualiser({
-    super.key,
     required this.recognitionProvider,
   });
 
@@ -138,7 +139,6 @@ class _mic_visualiser extends StatelessWidget {
 
 class _voice_conversation_controls extends StatelessWidget {
   const _voice_conversation_controls({
-    super.key,
     required this.conversationContext,
   });
 

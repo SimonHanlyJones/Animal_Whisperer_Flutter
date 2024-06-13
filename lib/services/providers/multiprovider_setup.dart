@@ -9,7 +9,7 @@ import 'voice_interaction_providers/voice_conversation_context_provider.dart';
 import 'voice_interaction_providers/synthesis_provider.dart';
 
 class AppProviders extends StatelessWidget {
-  const AppProviders({Key? key}) : super(key: key);
+  const AppProviders({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class AppProviders extends StatelessWidget {
                       chatMessagesProvider),
           ),
         ],
-        child: MyApp(),
+        child: const MyApp(),
       ),
     );
   }

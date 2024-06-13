@@ -6,8 +6,7 @@ import 'package:speech_to_text/speech_to_text_provider.dart';
 
 class Recognition_ProviderSetup extends StatefulWidget {
   final Widget child;
-  const Recognition_ProviderSetup({Key? key, required this.child})
-      : super(key: key);
+  const Recognition_ProviderSetup({super.key, required this.child});
 
   @override
   State<Recognition_ProviderSetup> createState() =>

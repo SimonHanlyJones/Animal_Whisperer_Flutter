@@ -93,7 +93,7 @@ class ChatMessagesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _initializeVertexAIFirebase(String system_prompt) async {
+  Future<void> _initializeVertexAIFirebase(String systemPrompt) async {
     final safetySettings = [
       SafetySetting(HarmCategory.harassment, HarmBlockThreshold.none),
       SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.none),
@@ -103,7 +103,7 @@ class ChatMessagesProvider with ChangeNotifier {
     _vertexAI = FirebaseVertexAI.instance;
     _model = _vertexAI.generativeModel(
         model: 'gemini-1.5-pro',
-        systemInstruction: Content.system(system_prompt),
+        systemInstruction: Content.system(systemPrompt),
         safetySettings: safetySettings);
     _googleChatSessions = _model.startChat();
   }

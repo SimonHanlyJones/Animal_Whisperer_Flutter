@@ -5,6 +5,8 @@ import '../../services/providers/authentication_provider.dart';
 import '../../theme/gradient_container.dart';
 
 class newAccountScreen extends StatelessWidget {
+  const newAccountScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     TextEditingController emailController = TextEditingController();
@@ -12,7 +14,7 @@ class newAccountScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Register"),
+        title: const Text("Register"),
       ),
       body: GradientContainer(
         child: Padding(
@@ -22,19 +24,19 @@ class newAccountScreen extends StatelessWidget {
             children: <Widget>[
               TextField(
                 controller: emailController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Email',
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               TextField(
                 controller: passwordController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Password',
                 ),
                 obscureText: true,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
                   // Create account with email and password
@@ -44,7 +46,7 @@ class newAccountScreen extends StatelessWidget {
                         .createAccountWithEmail(
                             emailController.text, passwordController.text);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Account created successfully')),
+                      const SnackBar(content: Text('Account created successfully')),
                     );
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -52,7 +54,7 @@ class newAccountScreen extends StatelessWidget {
                     );
                   }
                 },
-                child: Text('Create Account'),
+                child: const Text('Create Account'),
               ),
             ],
           ),

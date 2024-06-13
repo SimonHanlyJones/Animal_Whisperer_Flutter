@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:Animal_Whisperer/theme/gradient_container.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:provider/provider.dart';
 import '../../../components/chatHistoryDrawer/chat_history_drawer.dart';
 import 'textChatComponents/assistant_message_card.dart';
@@ -13,6 +12,8 @@ import '../voiceChat/voice_conversation_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -21,7 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  List<File> _pickedImagesForMessage = [];
+  final List<File> _pickedImagesForMessage = [];
   // final ImagePicker _picker = ImagePicker();
 
   @override
@@ -54,11 +55,11 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       // Small delay
       if (_scrollController.hasClients) {
         _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-            duration: Duration(milliseconds: 100), curve: Curves.easeOut);
+            duration: const Duration(milliseconds: 100), curve: Curves.easeOut);
       }
     });
   }
@@ -97,18 +98,18 @@ class _ChatScreenState extends State<ChatScreen> {
     final chatMessagesProvider = Provider.of<ChatMessagesProvider>(context);
 
     return Scaffold(
-      drawer: ChatHistoryDrawer(),
+      drawer: const ChatHistoryDrawer(),
       appBar: AppBar(
         // leading: Padding(
         //   padding: const EdgeInsets.all(8.0),
         //   child:
         //       Image.asset('assets/play_store_512.png'), // Path to your logo
         // ),
-        title: Text('The Animal Whisperer'),
+        title: const Text('The Animal Whisperer'),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.post_add),
+            icon: const Icon(Icons.post_add),
             onPressed: () {
               chatMessagesProvider.startNewChat();
             },
@@ -155,7 +156,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: Theme.of(context).colorScheme.secondary,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                   child: Row(
                     children: [
                       Expanded(
@@ -199,7 +200,7 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class ExpandableButtonWidget extends StatefulWidget {
-  ExpandableButtonWidget({
+  const ExpandableButtonWidget({
     super.key,
     required this.addImage,
   });
@@ -217,14 +218,14 @@ class _ExpandableButtonWidgetState extends State<ExpandableButtonWidget> {
   void _captureImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
-      this.widget.addImage(File(image.path));
+      widget.addImage(File(image.path));
     }
   }
 
   void _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      this.widget.addImage(File(image.path));
+      widget.addImage(File(image.path));
     }
   }
 
@@ -234,7 +235,7 @@ class _ExpandableButtonWidgetState extends State<ExpandableButtonWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         AnimatedContainer(
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           width: _isExpanded ? 146 : 0,
           child: Row(
             children: <Widget>[
@@ -258,11 +259,11 @@ class _ExpandableButtonWidgetState extends State<ExpandableButtonWidget> {
                   color: Theme.of(context).colorScheme.secondary,
                 ),
                 onPressed: () {
-                  Future.delayed(Duration(milliseconds: 300), () {
+                  Future.delayed(const Duration(milliseconds: 300), () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ConversationScreen(),
+                        builder: (context) => const ConversationScreen(),
                       ),
                     );
                   });
@@ -298,7 +299,7 @@ class PickedImagesDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -324,7 +325,7 @@ class PickedImagesDisplay extends StatelessWidget {
                       color: Theme.of(context).colorScheme.secondary,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.close,
                       color: Colors.white,
                       size: 20,

@@ -68,7 +68,7 @@ class ConversationContext with ChangeNotifier {
         // event.recognitionResult!.recognizedWords != null &&
         event.recognitionResult!.recognizedWords.trim().isNotEmpty) {
       if (_debounceTimerMessage?.isActive == true) return;
-      _debounceTimerMessage = Timer(Duration(milliseconds: 300), () {});
+      _debounceTimerMessage = Timer(const Duration(milliseconds: 300), () {});
       // Send the message
 
       aiMessageForSynthesis = await _chatMessagesProvider.sendMessage(
@@ -78,55 +78,61 @@ class ConversationContext with ChangeNotifier {
   }
 
   String removeMarkdown(String markdown) {
-    // Replace bold text with plain text
-    markdown = markdown.replaceAll(RegExp(r'\*\*(.+?)\*\*'), '');
-    markdown = markdown.replaceAll(RegExp('__(.+?)__'), '');
-
-    // Replace italicized text with plain text
-    markdown = markdown.replaceAll(RegExp('_(.+?)_'), '');
-    markdown = markdown.replaceAll(RegExp(r'\*(.+?)\*'), '');
+    // Replace bold and italic text with plain text
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'\*\*(.+?)\*\*'), (match) => match.group(1) ?? '');
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'__(.+?)__'), (match) => match.group(1) ?? '');
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'\*(.+?)\*'), (match) => match.group(1) ?? '');
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'_(.+?)_'), (match) => match.group(1) ?? '');
 
     // Replace strikethrough text with plain text
-    markdown = markdown.replaceAll(RegExp('~~(.+?)~~'), '');
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'~~(.+?)~~'), (match) => match.group(1) ?? '');
 
     // Replace inline code blocks with plain text
-    markdown = markdown.replaceAll(RegExp('`(.+?)`'), '');
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'`(.+?)`'), (match) => match.group(1) ?? '');
 
     // Replace code blocks with plain text
     markdown =
         markdown.replaceAll(RegExp(r'```[\s\S]*?```', multiLine: true), '');
-    markdown =
-        markdown.replaceAll(RegExp(r'```[\s\S]*?```', multiLine: true), '');
 
-    // Remove links
-    markdown = markdown.replaceAll(RegExp(r'\[(.+?)\]\((.+?)\)'), '');
+    // Replace links with just the link text
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'\[(.+?)\]\((.+?)\)'), (match) => match.group(1) ?? '');
 
-    // Remove images
-    markdown = markdown.replaceAll(RegExp(r'!\[(.+?)\]\((.+?)\)'), '');
+    // Remove images entirely
+    markdown = markdown.replaceAll(RegExp(r'!\[(.*?)\]\(.*?\)'), '');
 
-    // Remove headings
-    markdown =
-        markdown.replaceAll(RegExp(r'^#+\s+(.+?)\s*$', multiLine: true), '');
+    // Keep headings as plain text
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'^\s*#+\s*(.+?)\s*$', multiLine: true),
+        (match) => match.group(1) ?? '');
     markdown = markdown.replaceAll(RegExp(r'^\s*=+\s*$', multiLine: true), '');
     markdown = markdown.replaceAll(RegExp(r'^\s*-+\s*$', multiLine: true), '');
 
-    // Remove blockquotes
-    markdown =
-        markdown.replaceAll(RegExp(r'^\s*>\s+(.+?)\s*$', multiLine: true), '');
+    // Keep blockquotes as plain text
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'^\s*>\s*(.+?)\s*$', multiLine: true),
+        (match) => match.group(1) ?? '');
 
-    // Remove lists
-    markdown = markdown.replaceAll(
-      RegExp(r'^\s*[\*\+-]\s+(.+?)\s*$', multiLine: true),
-      '',
-    );
-    markdown = markdown.replaceAll(
-      RegExp(r'^\s*\d+\.\s+(.+?)\s*$', multiLine: true),
-      '',
-    );
+    // Keep list items as plain text
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'^\s*[\*\+-]\s+(.+?)\s*$', multiLine: true),
+        (match) => match.group(1) ?? '');
+    markdown = markdown.replaceAllMapped(
+        RegExp(r'^\s*\d+\.\s+(.+?)\s*$', multiLine: true),
+        (match) => match.group(1) ?? '');
 
     // Remove horizontal lines
     markdown =
         markdown.replaceAll(RegExp(r'^\s*[-*_]{3,}\s*$', multiLine: true), '');
+
+    // Remove any remaining Markdown symbols
+    markdown = markdown.replaceAll(RegExp(r'[_*`~]'), '');
 
     return markdown;
   }
@@ -139,7 +145,7 @@ class ConversationContext with ChangeNotifier {
         aiMessageForSynthesis != null) {
       if (_synthesisTimer?.isActive == true) return;
 
-      _synthesisTimer = Timer(Duration(milliseconds: 300), () {});
+      _synthesisTimer = Timer(const Duration(milliseconds: 300), () {});
       String text = aiMessageForSynthesis!.text;
       aiMessageForSynthesis = null;
       text = removeMarkdown(text);

@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../services/providers/authentication_provider.dart';
 
 class ChatHistoryDrawer extends StatelessWidget {
+  const ChatHistoryDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context);
@@ -54,17 +56,17 @@ class ChatHistoryDrawer extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text("Delete Chat"),
-                    content: Text("Are you sure you want to delete this chat?"),
+                    title: const Text("Delete Chat"),
+                    content: const Text("Are you sure you want to delete this chat?"),
                     actions: <Widget>[
                       TextButton(
-                        child: Text("Cancel"),
+                        child: const Text("Cancel"),
                         onPressed: () {
                           Navigator.of(context).pop(false);
                         },
                       ),
                       TextButton(
-                        child: Text("Delete"),
+                        child: const Text("Delete"),
                         onPressed: () {
                           Navigator.of(context).pop(true);
                         },
@@ -80,8 +82,8 @@ class ChatHistoryDrawer extends StatelessWidget {
             },
             child: Container(
               // color: Theme.of(context).colorScheme.secondary,
-              padding: EdgeInsets.all(10),
-              margin: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+              padding: const EdgeInsets.all(10),
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.secondary,
                 borderRadius: BorderRadius.circular(16),
@@ -100,10 +102,10 @@ class ChatHistoryDrawer extends StatelessWidget {
               ),
             ),
           );
-        }).toList(),
+        }),
         ListTile(
-          leading: Icon(Icons.exit_to_app),
-          title: Text('Sign Out'),
+          leading: const Icon(Icons.exit_to_app),
+          title: const Text('Sign Out'),
           onTap: () {
             Provider.of<AuthenticationProvider>(context, listen: false)
                 .signOut();
@@ -117,8 +119,8 @@ class ChatHistoryDrawer extends StatelessWidget {
   // Drawer content for non-signed in user
   Widget _buildSignInDrawer(BuildContext context) {
     return ListTile(
-      leading: Icon(Icons.login),
-      title: Text('Sign In'),
+      leading: const Icon(Icons.login),
+      title: const Text('Sign In'),
       onTap: () {
         Navigator.pop(context); // Close the drawer
         Navigator.pushNamed(context, '/signin'); // Navigate to the sign-in page

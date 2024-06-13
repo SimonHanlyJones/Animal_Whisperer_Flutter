@@ -5,11 +5,11 @@ import '../../textChat/textChatComponents/assistant_message_card.dart';
 class AssistantVoiceConversationInfoCard extends BaseAssistantCard {
   final String text;
 
-  AssistantVoiceConversationInfoCard({
+  AssistantVoiceConversationInfoCard({super.key, 
     required this.text,
     double maxWidthPercentage = 0.9,
     double minWidthPercentage = 0.9,
-    Alignment alignment = Alignment.center,
+    super.alignment = Alignment.center,
   }) : super(
           buildChild: (context) => Text(
             text,
@@ -20,7 +20,6 @@ class AssistantVoiceConversationInfoCard extends BaseAssistantCard {
             ),
           ),
           fixedWidth: true,
-          alignment: alignment,
         );
 }
 
@@ -31,12 +30,12 @@ class ConditionalAssistantCard extends StatelessWidget {
   final bool isSpeaking;
 
   const ConditionalAssistantCard({
-    Key? key,
+    super.key,
     required this.isConversationActive,
     required this.isListening,
     required this.isWaitingForResponse,
     required this.isSpeaking,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

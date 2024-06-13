@@ -6,6 +6,8 @@ import '../../theme/gradient_container.dart';
 import 'new_account_screen.dart';
 
 class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
+
   @override
   State<SignInPage> createState() => _SignInPageState();
 }
@@ -46,17 +48,17 @@ class _SignInPageState extends State<SignInPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sign In Here Mate!"),
+        title: const Text("Sign In Here Mate!"),
       ),
       body: GradientContainer(
         child: Column(
           children: [
             AnimatedContainer(
-              duration: Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 500),
               child: CircleAvatar(
                 radius: avatarRadius,
                 backgroundColor: const Color.fromARGB(0, 255, 255, 255),
-                backgroundImage: AssetImage(
+                backgroundImage: const AssetImage(
                     'assets/animan512.png'), // Make sure to add your image in the assets folder
               ),
             ),
@@ -67,19 +69,19 @@ class _SignInPageState extends State<SignInPage> with WidgetsBindingObserver {
                 children: <Widget>[
                   TextField(
                     controller: emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Email',
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   TextField(
                     controller: passwordController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Password',
                     ),
                     obscureText: true,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
                       // Sign in with email and password
@@ -96,9 +98,9 @@ class _SignInPageState extends State<SignInPage> with WidgetsBindingObserver {
                         );
                       }
                     },
-                    child: Text('Sign In with Email'),
+                    child: const Text('Sign In with Email'),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () async {
                       // Sign in with Google
@@ -114,18 +116,18 @@ class _SignInPageState extends State<SignInPage> with WidgetsBindingObserver {
                         );
                       }
                     },
-                    child: Text('Sign In with Google'),
+                    child: const Text('Sign In with Google'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => newAccountScreen()),
+                            builder: (context) => const newAccountScreen()),
                       );
                     },
-                    child: Text('Create an Account'),
+                    child: const Text('Create an Account'),
                   ),
                 ],
               ),

@@ -8,7 +8,7 @@ abstract class BaseUserCard extends StatelessWidget {
   final bool fixedWidth;
   final Alignment alignment;
 
-  BaseUserCard({
+  const BaseUserCard({super.key, 
     required this.buildChild,
     this.fixedWidth = false, // By default, it behaves dynamically
     this.alignment =
@@ -18,8 +18,8 @@ abstract class BaseUserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget card = Container(
-      padding: EdgeInsets.all(10),
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary,
         borderRadius: BorderRadius.circular(16),
@@ -54,7 +54,7 @@ abstract class BaseUserCard extends StatelessWidget {
 class UserMessageCard extends BaseUserCard {
   final Message message;
 
-  UserMessageCard({required this.message})
+  UserMessageCard({super.key, required this.message})
       : super(
           buildChild: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,14 +72,14 @@ class UserMessageCard extends BaseUserCard {
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Image.network(imageUrl),
                 );
-              }).toList(),
+              }),
             ],
           ),
         );
 }
 
 class UserLoadingCard extends BaseUserCard {
-  UserLoadingCard()
+  UserLoadingCard({super.key})
       : super(
           buildChild: (context) => LoadingAnimationWidget.waveDots(
             color: Theme.of(context).colorScheme.onSecondary,

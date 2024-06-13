@@ -10,7 +10,7 @@ abstract class BaseAssistantCard extends StatelessWidget {
   final bool fixedWidth;
   final Alignment alignment;
 
-  BaseAssistantCard({
+  const BaseAssistantCard({super.key, 
     required this.buildChild,
     this.fixedWidth = false,
     this.alignment = Alignment.centerLeft,
@@ -19,8 +19,8 @@ abstract class BaseAssistantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget card = Container(
-      padding: EdgeInsets.all(10),
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
@@ -55,7 +55,7 @@ abstract class BaseAssistantCard extends StatelessWidget {
 class AssistantMessageCard extends BaseAssistantCard {
   final Message message;
 
-  AssistantMessageCard({required this.message})
+  AssistantMessageCard({super.key, required this.message})
       : super(
           buildChild: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,14 +75,14 @@ class AssistantMessageCard extends BaseAssistantCard {
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Image.network(imageUrl),
                 );
-              }).toList(),
+              }),
             ],
           ),
         );
 }
 
 class AssistantLoadingCard extends BaseAssistantCard {
-  AssistantLoadingCard()
+  AssistantLoadingCard({super.key})
       : super(
           buildChild: (context) => LoadingAnimationWidget.waveDots(
             color: Theme.of(context).colorScheme.onTertiary,

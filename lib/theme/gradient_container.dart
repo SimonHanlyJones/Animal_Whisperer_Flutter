@@ -6,8 +6,7 @@ class GradientContainer extends StatelessWidget {
   final double height;
 
   const GradientContainer(
-      {Key? key, required this.child, this.width = 0, this.height = 0})
-      : super(key: key);
+      {super.key, required this.child, this.width = 0, this.height = 0});
 
   @override
   Widget build(BuildContext context) {

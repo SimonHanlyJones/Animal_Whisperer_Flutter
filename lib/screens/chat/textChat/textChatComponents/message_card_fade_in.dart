@@ -4,9 +4,8 @@ class FadeInListItem extends StatefulWidget {
   final Widget child;
   final int durationMilliseconds;
 
-  FadeInListItem(
-      {Key? key, required this.child, this.durationMilliseconds = 600})
-      : super(key: key);
+  const FadeInListItem(
+      {super.key, required this.child, this.durationMilliseconds = 600});
 
   @override
   _FadeInListItemState createState() => _FadeInListItemState();

@@ -16,7 +16,7 @@ class AppTheme {
   static ThemeData get greenTheme {
     return ThemeData(
       useMaterial3: true, // Ensure Material 3 is enabled
-      colorScheme: ColorScheme(
+      colorScheme: const ColorScheme(
         brightness: Brightness.light,
         // header and footer colors
         primary: Color(0xFFB89842),
@@ -34,7 +34,7 @@ class AppTheme {
         surfaceContainer: Color.fromARGB(255, 99, 128, 86),
         surfaceContainerHigh: Color.fromARGB(255, 66, 87, 56),
       ),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: headerColour, // Set AppBar background color
         titleTextStyle: TextStyle(
           color: Color(0xFF3c341f), // Set AppBar text color
@@ -52,8 +52,8 @@ class AppTheme {
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide.none,
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-        hintStyle: TextStyle(
+        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        hintStyle: const TextStyle(
           color: textParchment,
           fontSize: 16, // Adjust the font size as needed
           height: 1.25,

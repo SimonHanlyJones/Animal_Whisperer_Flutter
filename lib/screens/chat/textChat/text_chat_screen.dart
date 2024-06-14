@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../components/chatHistoryDrawer/chat_history_drawer.dart';
 import 'textChatComponents/assistant_message_card.dart';
 import 'textChatComponents/blank_screen_content.dart';
+import 'textChatComponents/expandable_button_widget.dart';
 import 'textChatComponents/message_card_fade_in.dart';
 import 'textChatComponents/user_message_card.dart';
 import '../../../services/providers/chat_messages_provider/chat_messages_provider.dart';
@@ -105,10 +106,17 @@ class _ChatScreenState extends State<ChatScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.post_add),
-            onPressed: () {
-              chatMessagesProvider.startNewChat();
-            },
+            icon: Icon(
+              Icons.post_add,
+              color: chatMessagesProvider.waitingForResponse ||
+                      chatMessagesProvider.waitingForImages
+                  ? Colors.grey
+                  : Theme.of(context).colorScheme.onSecondary,
+            ),
+            onPressed: chatMessagesProvider.waitingForResponse ||
+                    chatMessagesProvider.waitingForImages
+                ? null
+                : () => chatMessagesProvider.startNewChat(),
           ),
         ],
       ),
@@ -117,9 +125,10 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             chatMessagesProvider.messages.length <= 1
                 ? BlankScreenContent()
-                : text_chat_bubbles_builder(
-                    scrollController: _scrollController,
-                    chatMessagesProvider: chatMessagesProvider),
+                : Container(),
+            text_chat_bubbles_builder(
+                scrollController: _scrollController,
+                chatMessagesProvider: chatMessagesProvider),
             _buildTextComposer(context),
           ],
         ),
@@ -194,94 +203,6 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class ExpandableButtonWidget extends StatefulWidget {
-  const ExpandableButtonWidget({
-    super.key,
-    required this.addImage,
-  });
-  final Function(File?) addImage;
-
-  @override
-  State<ExpandableButtonWidget> createState() => _ExpandableButtonWidgetState();
-}
-
-class _ExpandableButtonWidgetState extends State<ExpandableButtonWidget> {
-  bool _isExpanded = false;
-
-  final ImagePicker _picker = ImagePicker();
-
-  void _captureImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-    if (image != null) {
-      widget.addImage(File(image.path));
-    }
-  }
-
-  void _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      widget.addImage(File(image.path));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          width: _isExpanded ? 146 : 0,
-          child: Row(
-            children: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.photo_camera,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                onPressed: _captureImage,
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.image,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                onPressed: _pickImage,
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.phone,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                onPressed: () {
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ConversationScreen(),
-                      ),
-                    );
-                  });
-                },
-              ),
-            ],
-          ),
-        ),
-        IconButton.filled(
-          icon: Icon(_isExpanded ? Icons.cancel : Icons.add_circle),
-          color: Theme.of(context).colorScheme.secondary,
-          iconSize: 32,
-          onPressed: () {
-            setState(() {
-              _isExpanded = !_isExpanded;
-            });
-          },
-        ),
-      ],
     );
   }
 }

@@ -14,20 +14,17 @@ class BlankScreenContent extends StatelessWidget {
       "🐦\n Why do birds sing?",
       "🐠\n How do fish breathe underwater?",
       "🐘\n Why do elephants have big ears?",
-      "🦘\n Can kangaroos swim?",
     ];
 
-    return Expanded(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: exampleQuestions.map((question) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ExampleQuestionCard(question: question),
-            );
-          }).toList(),
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: exampleQuestions.map((question) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ExampleQuestionCard(question: question),
+          );
+        }).toList(),
       ),
     );
   }

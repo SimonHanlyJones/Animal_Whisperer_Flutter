@@ -11,6 +11,32 @@ class newAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
+    AuthenticationProvider authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
+
+    Future<bool> _createAccountAndSignIn() async {
+      // Create account with email and password
+      try {
+        await authProvider.createAccountWithEmail(
+            emailController.text, passwordController.text);
+        authProvider.signInWithEmail(
+            emailController.text, passwordController.text);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created successfully')),
+        );
+        emailController.clear();
+        passwordController.clear();
+        Navigator.pop(context);
+        return true;
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create account: $e')),
+        );
+        return false;
+      }
+    }
+
+    ;
 
     return Scaffold(
       appBar: AppBar(
@@ -39,20 +65,7 @@ class newAccountScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  // Create account with email and password
-                  try {
-                    await Provider.of<AuthenticationProvider>(context,
-                            listen: false)
-                        .createAccountWithEmail(
-                            emailController.text, passwordController.text);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Account created successfully')),
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to create account: $e')),
-                    );
-                  }
+                  await _createAccountAndSignIn();
                 },
                 child: const Text('Create Account'),
               ),

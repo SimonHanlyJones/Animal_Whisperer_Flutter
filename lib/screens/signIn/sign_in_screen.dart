@@ -50,104 +50,95 @@ class _SignInPageState extends State<SignInPage> with WidgetsBindingObserver {
       appBar: AppBar(
         title: const Text("Sign In Here Mate!"),
       ),
-      body: GradientContainer(
-        child: Column(
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 500),
-              child: CircleAvatar(
-                radius: avatarRadius,
-                backgroundColor: const Color.fromARGB(0, 255, 255, 255),
-                backgroundImage: const AssetImage(
-                    'assets/animan512.png'), // Make sure to add your image in the assets folder
-              ),
+      body: SingleChildScrollView(
+        child: Expanded(
+          child: GradientContainer(
+            child: Column(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  child: CircleAvatar(
+                    radius: avatarRadius,
+                    backgroundColor: const Color.fromARGB(0, 255, 255, 255),
+                    backgroundImage: const AssetImage(
+                        'assets/animan512.png'), // Make sure to add your image in the assets folder
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      TextField(
+                        controller: emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: passwordController,
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                        ),
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () async {
+                          // Sign in with email and password
+                          try {
+                            await Provider.of<AuthenticationProvider>(context,
+                                    listen: false)
+                                .signInWithEmail(emailController.text,
+                                    passwordController.text);
+                            emailController.clear();
+                            passwordController.clear();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed to sign in: $e')),
+                            );
+                          }
+                        },
+                        child: const Text('Sign In with Email'),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          // Sign in with Google
+                          try {
+                            await Provider.of<AuthenticationProvider>(context,
+                                    listen: false)
+                                .signInWithGoogle();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Failed to sign in with Google: $e')),
+                            );
+                          }
+                        },
+                        child: const Text('Sign In with Google'),
+                      ),
+                      const SizedBox(height: 20),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const newAccountScreen()),
+                          );
+                        },
+                        child: const Text('Create an Account'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                    ),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Sign in with email and password
-                      try {
-                        await Provider.of<AuthenticationProvider>(context,
-                                listen: false)
-                            .signInWithEmail(
-                                emailController.text, passwordController.text);
-                        emailController.clear();
-                        passwordController.clear();
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to sign in: $e')),
-                        );
-                      }
-                    },
-                    child: const Text('Sign In with Email'),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Sign in with Google
-                      try {
-                        await Provider.of<AuthenticationProvider>(context,
-                                listen: false)
-                            .signInWithGoogle();
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content:
-                                  Text('Failed to sign in with Google: $e')),
-                        );
-                      }
-                    },
-                    child: const Text('Sign In with Google'),
-                  ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const newAccountScreen()),
-                      );
-                    },
-                    child: const Text('Create an Account'),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
-
-// class _KeyboardVisibilityObserver extends WidgetsBindingObserver {
-//   final _SignInPageState _state;
-
-//   _KeyboardVisibilityObserver(this._state);
-
-//   @override
-//   void didChangeMetrics() {
-//     final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
-//     final isKeyboardVisible = bottomInset > 0.0;
-//     _state._updateAvatarSize(isKeyboardVisible);
-//   }
-// }

@@ -1,25 +1,39 @@
-
 # The Animal Whisperer
 
-PUT SCREENSHOT HERE
+<img src="https://github.com/SimonHanlyJones/Animal_Whisperer_Flutter/assets/46434944/bb681322-3f94-4c8f-a32c-a4c7b76f6d5e" alt="Screenshot_20240614-132316" width="300"/>
 
-Welcome to "The Animal Whisperer," a chatbot designed to assist users with their animal care queries in an engaging and fun manner. Originally built with React Native, the app has been completely rebuilt in Flutter, introducing significant enhancements. This portfolio project showcases robust voice conversations, image processing capabilities, chat history, and cloud-based account management for seamless integration across devices.
+<img src="https://github.com/SimonHanlyJones/Animal_Whisperer_Flutter/assets/46434944/73b4b395-51bb-4a10-a56b-d58d5fc80a02" alt="Screenshot_20240613-141720" width="300"/>
+
+
+Welcome to "The Animal Whisperer," a chatbot designed to assist users with their animal care queries any be funny. Originally built with React Native, the app has been completely rebuilt and ehanched in Flutter. This portfolio project showcases full multimodal AI input, with voice conversations, image processing, chat history, and cloud-based account management for seamless integration across devices.
 
 ## Features
 
-- **Voice Interactions:** Speak directly to the chatbot and receive spoken responses for a more natural user experience.
-- **Image Processing:** Upload and analyze images to receive advice and information about the animals in the pictures.
+- **Voice Interactions:** Speak directly to the chatbot and receive spoken response.
+
+<img src="https://github.com/SimonHanlyJones/Animal_Whisperer_Flutter/assets/46434944/3b06bf79-76b1-4f31-b5a7-5d5bb4e9a484" alt="Screenshot_20240613-141835" width="300"/>
+
+- **Image Processing:** Upload and analyse images to receive advice and information about the pictures.
+
+<img src="https://github.com/SimonHanlyJones/Animal_Whisperer_Flutter/assets/46434944/c42f1198-dceb-441b-81e2-f08c9428728c" alt="Screenshot_20240613-141823" width="300"/>
+
 - **Chat History:** Keep track of past interactions for reference and continuity in conversations.
-- **Cloud-Based Account Management:** Secure and seamless user experience across multiple devices with cloud storage.
+
+<img src="https://github.com/SimonHanlyJones/Animal_Whisperer_Flutter/assets/46434944/16521bf5-6916-4185-8ad6-a23bb1df9e0e" alt="Screenshot_20240614-132329" width="300"/>
+
+- **Cloud-Based Account Management:** Secure and seamless user experience across multiple devices with cloud storage using Firebase.
+
+<img src="https://github.com/SimonHanlyJones/Animal_Whisperer_Flutter/assets/46434944/ddad9efb-f20d-4e6e-8ed8-487002e57d66" alt="Screenshot_20240613-141720" width="300"/>
+
 - **OAuth Security:** Robust authentication protocols to ensure user data protection and security.
 - **Customized AI Engine:** Uses a specially tailored version of a large language model optimized for answering questions related to animal care.
+
 
 ## Getting Started
 
 ### Prerequisites
 
-- Android or iOS device for installation and testing.
-- No Firebase account needed for users; all backend setup is already handled.
+- Android device for installation and testing.
 
 ### Installation
 
@@ -56,10 +70,5 @@ Welcome to "The Animal Whisperer," a chatbot designed to assist users with their
 
 ### Usage
 
-Open "The Animal Whisperer" on your device and start a conversation by tapping the microphone icon. Speak your query, and the chatbot will process your input and respond vocally. Use the camera icon to upload images for analysis.
+Open "The Animal Whisperer" device, sign in and start chatting. Voice conversation and images can be accessed via the "+" button.
 
-For any issues or questions regarding the installation or operation of the app, please refer to the troubleshooting guide or contact support.
-
-PUT SCREENSHOT HERE
-
-This project is a demonstration of my skills in mobile application development, particularly in building responsive, feature-rich applications using modern frameworks. It aims to showcase my ability to integrate advanced functionalities like voice interaction, image processing, and cloud-based services into a cohesive user experience.

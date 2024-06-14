@@ -8,7 +8,7 @@ import 'package:speech_to_text/speech_to_text_provider.dart';
 
 import 'synthesis_provider.dart';
 
-class ConversationContext with ChangeNotifier {
+class VoiceConversationContext with ChangeNotifier {
   bool _isConversation = false;
   Message? _aiMessageForSynthesis;
   late SpeechToTextProvider _recognitionProvider;
@@ -20,7 +20,7 @@ class ConversationContext with ChangeNotifier {
   bool get isConversation => _isConversation;
   Message? get aiMessageForSynthesis => _aiMessageForSynthesis;
 
-  ConversationContext();
+  VoiceConversationContext();
 
   void updateDependencies(
       SynthesisProvider synthesisProvider,

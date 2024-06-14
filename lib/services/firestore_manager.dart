@@ -18,7 +18,7 @@ class FirebaseManager {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> deleteChatSession(String sessionId) async {
+  Future<void> deleteChatSessionAndImages(String sessionId) async {
     try {
       // Fetch the chat session
       CurrentChatSession session = await getChatSession(sessionId);

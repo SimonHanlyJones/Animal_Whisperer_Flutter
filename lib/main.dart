@@ -8,12 +8,15 @@ import 'theme/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await dotenv.load(fileName: ".env");
 
   runApp(const AppProviders());
@@ -29,7 +32,9 @@ class MyApp extends StatelessWidget {
       title: 'The Animal Whisperer',
       theme: AppTheme.greenTheme,
       home: SelectionArea(
-        child: authProvider.currentUser != null ? const ChatScreen() : const SignInPage(),
+        child: authProvider.currentUser != null
+            ? const ChatScreen()
+            : const SignInPage(),
       ),
     );
   }

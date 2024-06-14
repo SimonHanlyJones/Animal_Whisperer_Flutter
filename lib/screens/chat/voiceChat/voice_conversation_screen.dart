@@ -14,13 +14,13 @@ class ConversationScreen extends StatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
-  late ConversationContext conversationContext;
+  late VoiceConversationContext conversationContext;
 
   @override
   void initState() {
     super.initState();
     conversationContext =
-        Provider.of<ConversationContext>(context, listen: false);
+        Provider.of<VoiceConversationContext>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       conversationContext.startConversation();

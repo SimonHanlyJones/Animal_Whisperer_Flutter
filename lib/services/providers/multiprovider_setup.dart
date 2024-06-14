@@ -25,8 +25,8 @@ class AppProviders extends StatelessWidget {
           ChangeNotifierProvider<SynthesisProvider>(
               create: (_) => SynthesisProvider()),
           ChangeNotifierProxyProvider3<SynthesisProvider, SpeechToTextProvider,
-              ChatMessagesProvider, ConversationContext>(
-            create: (context) => ConversationContext(),
+              ChatMessagesProvider, VoiceConversationContext>(
+            create: (context) => VoiceConversationContext(),
             update: (context, synthesisProvider, recognitionProvider,
                     chatMessagesProvider, conversationContext) =>
                 conversationContext!

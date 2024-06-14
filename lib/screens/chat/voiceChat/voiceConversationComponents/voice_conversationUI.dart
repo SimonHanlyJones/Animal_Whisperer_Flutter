@@ -20,7 +20,7 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
   AnimationController? _controller;
   Animation<double>? _animation;
   late SynthesisProvider synthesisProvider;
-  late ConversationContext conversationContext;
+  late VoiceConversationContext conversationContext;
   late ChatMessagesProvider chatMessagesProvider;
 
   @override
@@ -50,7 +50,7 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
   void didChangeDependencies() {
     super.didChangeDependencies();
     synthesisProvider = Provider.of<SynthesisProvider>(context);
-    conversationContext = Provider.of<ConversationContext>(context);
+    conversationContext = Provider.of<VoiceConversationContext>(context);
     chatMessagesProvider = Provider.of<ChatMessagesProvider>(context);
     // synthesisProvider.listVoices();
 
@@ -142,7 +142,7 @@ class _voice_conversation_controls extends StatelessWidget {
     required this.conversationContext,
   });
 
-  final ConversationContext conversationContext;
+  final VoiceConversationContext conversationContext;
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +175,7 @@ class _voice_conversation_controls extends StatelessWidget {
 }
 
 Widget _voice_conversation_footer(BuildContext context) {
-  var conversationContext = Provider.of<ConversationContext>(context);
+  var conversationContext = Provider.of<VoiceConversationContext>(context);
   return Container(
     color: Theme.of(context).colorScheme.primary,
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

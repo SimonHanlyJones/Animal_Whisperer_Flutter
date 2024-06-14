@@ -10,7 +10,6 @@ class ChatHistoryDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context);
-
     return Drawer(
       child: Container(
         child: GradientContainer(
@@ -57,7 +56,8 @@ class ChatHistoryDrawer extends StatelessWidget {
                 builder: (BuildContext context) {
                   return AlertDialog(
                     title: const Text("Delete Chat"),
-                    content: const Text("Are you sure you want to delete this chat?"),
+                    content: const Text(
+                        "Are you sure you want to delete this chat?"),
                     actions: <Widget>[
                       TextButton(
                         child: const Text("Cancel"),

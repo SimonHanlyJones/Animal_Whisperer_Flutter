@@ -28,8 +28,15 @@ class ChatMessagesProvider with ChangeNotifier {
   }
 
   Future<void> deleteChatSession(String fireStoreSessionId) async {
+    final sessionIndex =
+        _chatHistory.indexWhere((session) => session.id == fireStoreSessionId);
+    if (sessionIndex == -1) return;
+
+    final removedSession = _chatHistory.removeAt(sessionIndex);
+    notifyListeners();
+
     try {
-      _firestoreManager.deleteChatSession(fireStoreSessionId);
+      await _firestoreManager.deleteChatSessionAndImages(fireStoreSessionId);
 
       // Update current chat session if necessary
       if (currentChatSessionFirestoreId == fireStoreSessionId) {
@@ -40,6 +47,9 @@ class ChatMessagesProvider with ChangeNotifier {
       _chatHistory = await _firestoreManager.getChatHistory();
       notifyListeners();
     } catch (e) {
+      // Restore the session in case of an error
+      _chatHistory.insert(sessionIndex, removedSession);
+      notifyListeners();
       _logger.e('Failed to delete chat session: $e');
     }
   }

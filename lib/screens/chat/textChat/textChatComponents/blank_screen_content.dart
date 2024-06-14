@@ -16,15 +16,19 @@ class BlankScreenContent extends StatelessWidget {
       "🐘\n Why do elephants have big ears?",
     ];
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: exampleQuestions.map((question) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ExampleQuestionCard(question: question),
-          );
-        }).toList(),
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: exampleQuestions.map((question) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ExampleQuestionCard(question: question),
+              );
+            }).toList(),
+          ),
+        ),
       ),
     );
   }

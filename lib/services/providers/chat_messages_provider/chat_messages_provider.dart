@@ -68,15 +68,14 @@ class ChatMessagesProvider with ChangeNotifier {
     Message titleMessage = Message(
         role: "system",
         text:
-            "You are a creative title generator. Your job is to read the following chat exchange and provide a funny title for the conversation that is no more than 5 words. Do so in a funny, overenthusiastic, Australian manner like a famous Australian Crocodile Hunter. Include any plausible animal reference and attempt to alliterate if possible. The goal is fun and humor rather than precision. Do not include additional "
-            ".");
+            "You are a creative title generator. Your job is to read the following chat exchange and provide a funny title for the conversation that is no more than 5 words. Do so in a funny, overenthusiastic, Australian manner like a famous Australian Crocodile Hunter. Include any plausible animal reference and attempt to alliterate if possible. The goal is fun and humor rather than precision.");
     List<Message> messagesCopy = List.from(_currentChatSession.messages);
     messagesCopy[0] = titleMessage;
 
     try {
       Message? title = await _ApiCallFirebaseCustom(messagesCopy);
-      if (title != null) {
-        _currentChatSession.title = title.text;
+      if (title != null && title.text != null) {
+        _currentChatSession.title = title.text!.replaceAll('"', '');
         _firestoreManager.updateChatSessionTitle(
             currentChatSessionFirestoreId, _currentChatSession);
 

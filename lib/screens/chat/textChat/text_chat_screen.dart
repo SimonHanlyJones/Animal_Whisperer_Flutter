@@ -10,8 +10,6 @@ import 'textChatComponents/expandable_button_widget.dart';
 import 'textChatComponents/message_card_fade_in.dart';
 import 'textChatComponents/user_message_card.dart';
 import '../../../services/providers/chat_messages_provider/chat_messages_provider.dart';
-import '../voiceChat/voice_conversation_screen.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -120,16 +118,18 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
+      resizeToAvoidBottomInset: true,
       body: GradientContainer(
         child: Column(
           children: [
-            chatMessagesProvider.messages.length <= 1
+            chatMessagesProvider.messages.length <= 1 &&
+                    !chatMessagesProvider.waitingForImages &&
+                    !chatMessagesProvider.waitingForResponse
                 ? BlankScreenContent()
-                : Container(),
-            text_chat_bubbles_builder(
-                scrollController: _scrollController,
-                chatMessagesProvider: chatMessagesProvider),
-            _buildTextComposer(context),
+                : text_chat_bubbles_builder(
+                    scrollController: _scrollController,
+                    chatMessagesProvider: chatMessagesProvider),
+            SafeArea(child: _buildTextComposer(context)),
           ],
         ),
       ),

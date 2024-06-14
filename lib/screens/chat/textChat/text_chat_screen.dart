@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../components/chatHistoryDrawer/chat_history_drawer.dart';
 import 'textChatComponents/assistant_message_card.dart';
+import 'textChatComponents/blank_screen_content.dart';
 import 'textChatComponents/message_card_fade_in.dart';
 import 'textChatComponents/user_message_card.dart';
 import '../../../services/providers/chat_messages_provider/chat_messages_provider.dart';
@@ -100,11 +101,6 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       drawer: const ChatHistoryDrawer(),
       appBar: AppBar(
-        // leading: Padding(
-        //   padding: const EdgeInsets.all(8.0),
-        //   child:
-        //       Image.asset('assets/play_store_512.png'), // Path to your logo
-        // ),
         title: const Text('The Animal Whisperer'),
         centerTitle: true,
         actions: [
@@ -119,9 +115,11 @@ class _ChatScreenState extends State<ChatScreen> {
       body: GradientContainer(
         child: Column(
           children: [
-            text_chat_bubbles_builder(
-                scrollController: _scrollController,
-                chatMessagesProvider: chatMessagesProvider),
+            chatMessagesProvider.messages.length <= 1
+                ? BlankScreenContent()
+                : text_chat_bubbles_builder(
+                    scrollController: _scrollController,
+                    chatMessagesProvider: chatMessagesProvider),
             _buildTextComposer(context),
           ],
         ),
@@ -156,7 +154,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: Theme.of(context).colorScheme.secondary,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                   child: Row(
                     children: [
                       Expanded(

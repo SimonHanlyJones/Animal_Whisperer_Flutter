@@ -4,9 +4,14 @@ import 'package:provider/provider.dart';
 import '../../services/providers/authentication_provider.dart';
 import '../../theme/gradient_container.dart';
 
-class newAccountScreen extends StatelessWidget {
+class newAccountScreen extends StatefulWidget {
   const newAccountScreen({super.key});
 
+  @override
+  State<newAccountScreen> createState() => _newAccountScreenState();
+}
+
+class _newAccountScreenState extends State<newAccountScreen> {
   @override
   Widget build(BuildContext context) {
     TextEditingController emailController = TextEditingController();
@@ -14,29 +19,32 @@ class newAccountScreen extends StatelessWidget {
     AuthenticationProvider authProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
 
-    Future<bool> _createAccountAndSignIn() async {
+    Future<bool> createAccountAndSignIn() async {
       // Create account with email and password
       try {
         await authProvider.createAccountWithEmail(
             emailController.text, passwordController.text);
         authProvider.signInWithEmail(
             emailController.text, passwordController.text);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Account created successfully')),
-        );
-        emailController.clear();
-        passwordController.clear();
-        Navigator.pop(context);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Account created successfully')),
+          );
+          emailController.clear();
+          passwordController.clear();
+          Navigator.pop(context);
+        }
+
         return true;
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create account: $e')),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to create account: $e')),
+          );
+        }
         return false;
       }
     }
-
-    ;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,7 +73,7 @@ class newAccountScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  await _createAccountAndSignIn();
+                  await createAccountAndSignIn();
                 },
                 child: const Text('Create Account'),
               ),

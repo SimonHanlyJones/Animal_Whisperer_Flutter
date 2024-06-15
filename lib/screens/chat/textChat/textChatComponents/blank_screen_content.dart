@@ -5,6 +5,8 @@ import '../../../../services/providers/chat_messages_provider/chat_messages_prov
 import 'assistant_message_card.dart';
 
 class BlankScreenContent extends StatelessWidget {
+  const BlankScreenContent({super.key});
+
   @override
   Widget build(BuildContext context) {
     List<String> exampleQuestions = [
@@ -12,23 +14,33 @@ class BlankScreenContent extends StatelessWidget {
       "🐶\n Do dogs dream?",
       "🐆\n How fast can a cheetah run?",
       "🐦\n Why do birds sing?",
+      "🦘\n How high do kangaroos jump?",
       "🐠\n How do fish breathe underwater?",
       "🐘\n Why do elephants have big ears?",
     ];
 
     return Expanded(
-      child: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: exampleQuestions.map((question) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ExampleQuestionCard(question: question),
-              );
-            }).toList(),
-          ),
-        ),
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight,
+              ),
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: exampleQuestions.map((question) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ExampleQuestionCard(question: question),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -37,7 +49,7 @@ class BlankScreenContent extends StatelessWidget {
 class ExampleQuestionCard extends BaseAssistantCard {
   final String question;
 
-  ExampleQuestionCard({required this.question})
+  ExampleQuestionCard({super.key, required this.question})
       : super(
             buildChild: (context) {
               final chatMessagesProvider =
@@ -63,7 +75,7 @@ class ExampleQuestionCard extends BaseAssistantCard {
 class MessageList extends StatelessWidget {
   final List<String> messages;
 
-  MessageList({required this.messages});
+  const MessageList({super.key, required this.messages});
 
   @override
   Widget build(BuildContext context) {

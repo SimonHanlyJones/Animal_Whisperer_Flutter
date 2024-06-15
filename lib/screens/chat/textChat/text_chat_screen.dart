@@ -15,10 +15,10 @@ class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  ChatScreenState createState() => ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
@@ -125,8 +125,8 @@ class _ChatScreenState extends State<ChatScreen> {
             chatMessagesProvider.messages.length <= 1 &&
                     !chatMessagesProvider.waitingForImages &&
                     !chatMessagesProvider.waitingForResponse
-                ? BlankScreenContent()
-                : text_chat_bubbles_builder(
+                ? const BlankScreenContent()
+                : TextChatBubblesBuilder(
                     scrollController: _scrollController,
                     chatMessagesProvider: chatMessagesProvider),
             SafeArea(child: _buildTextComposer(context)),
@@ -261,8 +261,8 @@ class PickedImagesDisplay extends StatelessWidget {
   }
 }
 
-class text_chat_bubbles_builder extends StatelessWidget {
-  const text_chat_bubbles_builder({
+class TextChatBubblesBuilder extends StatelessWidget {
+  const TextChatBubblesBuilder({
     super.key,
     required ScrollController scrollController,
     required this.chatMessagesProvider,

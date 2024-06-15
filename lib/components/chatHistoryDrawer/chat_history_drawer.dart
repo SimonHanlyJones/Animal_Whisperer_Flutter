@@ -11,32 +11,28 @@ class ChatHistoryDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context);
     return Drawer(
-      child: Container(
-        child: GradientContainer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              SizedBox(
-                height: 144,
-                child: Container(
-                  child: DrawerHeader(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary),
-                    child: Text(
-                      'Tail Tales',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary,
-                        fontSize: 24,
-                      ),
-                    ),
+      child: GradientContainer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            SizedBox(
+              height: 144,
+              child: DrawerHeader(
+                decoration:
+                    BoxDecoration(color: Theme.of(context).colorScheme.primary),
+                child: Text(
+                  'Tail Tales',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontSize: 24,
                   ),
                 ),
               ),
-              authProvider.currentUser != null
-                  ? _buildUserDrawer(context)
-                  : _buildSignInDrawer(context),
-            ],
-          ),
+            ),
+            authProvider.currentUser != null
+                ? _buildUserDrawer(context)
+                : _buildSignInDrawer(context),
+          ],
         ),
       ),
     );

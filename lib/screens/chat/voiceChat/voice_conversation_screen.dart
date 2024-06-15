@@ -52,7 +52,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ),
           title: const Text('Lets have a chat!'),
         ),
-        body: const ConversationScreenUI(),
+        body: const VoiceConversationScreenUI(),
       ),
     );
   }

@@ -8,14 +8,15 @@ import '../../../../services/providers/chat_messages_provider/chat_messages_prov
 import '../../../../services/providers/voice_interaction_providers/voice_conversation_context_provider.dart';
 import 'assistant_voice_conversation_card.dart';
 
-class ConversationScreenUI extends StatefulWidget {
-  const ConversationScreenUI({super.key});
+class VoiceConversationScreenUI extends StatefulWidget {
+  const VoiceConversationScreenUI({super.key});
 
   @override
-  State<ConversationScreenUI> createState() => _ConversationScreenUIState();
+  State<VoiceConversationScreenUI> createState() =>
+      VoiceConversationScreenUIState();
 }
 
-class _ConversationScreenUIState extends State<ConversationScreenUI>
+class VoiceConversationScreenUIState extends State<VoiceConversationScreenUI>
     with SingleTickerProviderStateMixin {
   AnimationController? _controller;
   Animation<double>? _animation;
@@ -92,7 +93,7 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
               child: Container(),
             ), // Spacing between mic visualizer and text
             // Conditional text
-            _mic_visualiser(recognitionProvider: recognitionProvider),
+            _MicVisualiser(recognitionProvider: recognitionProvider),
             const SizedBox(height: 20),
 
             _voice_conversation_footer(context),
@@ -104,8 +105,8 @@ class _ConversationScreenUIState extends State<ConversationScreenUI>
   }
 }
 
-class _mic_visualiser extends StatelessWidget {
-  const _mic_visualiser({
+class _MicVisualiser extends StatelessWidget {
+  const _MicVisualiser({
     required this.recognitionProvider,
   });
 
@@ -137,8 +138,8 @@ class _mic_visualiser extends StatelessWidget {
   }
 }
 
-class _voice_conversation_controls extends StatelessWidget {
-  const _voice_conversation_controls({
+class _VoiceConversationControls extends StatelessWidget {
+  const _VoiceConversationControls({
     required this.conversationContext,
   });
 
@@ -179,7 +180,6 @@ Widget _voice_conversation_footer(BuildContext context) {
   return Container(
     color: Theme.of(context).colorScheme.primary,
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-    child:
-        _voice_conversation_controls(conversationContext: conversationContext),
+    child: _VoiceConversationControls(conversationContext: conversationContext),
   );
 }

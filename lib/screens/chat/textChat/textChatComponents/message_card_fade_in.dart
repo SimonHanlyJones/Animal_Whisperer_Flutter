@@ -8,10 +8,10 @@ class FadeInListItem extends StatefulWidget {
       {super.key, required this.child, this.durationMilliseconds = 600});
 
   @override
-  _FadeInListItemState createState() => _FadeInListItemState();
+  FadeInListItemState createState() => FadeInListItemState();
 }
 
-class _FadeInListItemState extends State<FadeInListItem>
+class FadeInListItemState extends State<FadeInListItem>
     with SingleTickerProviderStateMixin {
   AnimationController? _controller;
   Animation<double>? _opacityAnimation;
